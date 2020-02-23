@@ -1073,18 +1073,33 @@ pub extern fn DrawRectangleVShim(position: * const Vector2, size: * const Vector
 pub        fn DrawRectangleV(position: Vector2, size: Vector2, color: Color) void {
     DrawRectangleVShim(&position, &size, color);
 }
-pub extern fn DrawRectangleRec(rec: Rectangle, color: Color) void;
-pub extern fn DrawRectangleProShim(rec: Rectangle, origin: * const Vector2, rotation: f32, color: Color)  void;
+pub extern fn DrawRectangleRecShim(rec: * const Rectangle, color: Color)  void;
+pub        fn DrawRectangleRec(rec: Rectangle, color: Color) void {
+    DrawRectangleRecShim(&rec, color);
+}
+pub extern fn DrawRectangleProShim(rec: * const Rectangle, origin: * const Vector2, rotation: f32, color: Color)  void;
 pub        fn DrawRectanglePro(rec: Rectangle, origin: Vector2, rotation: f32, color: Color) void {
-    DrawRectangleProShim(rec, &origin, rotation, color);
+    DrawRectangleProShim(&rec, &origin, rotation, color);
 }
 pub extern fn DrawRectangleGradientV(posX: c_int, posY: c_int, width: c_int, height: c_int, color1: Color, color2: Color) void;
 pub extern fn DrawRectangleGradientH(posX: c_int, posY: c_int, width: c_int, height: c_int, color1: Color, color2: Color) void;
-pub extern fn DrawRectangleGradientEx(rec: Rectangle, col1: Color, col2: Color, col3: Color, col4: Color) void;
+pub extern fn DrawRectangleGradientExShim(rec: * const Rectangle, col1: Color, col2: Color, col3: Color, col4: Color)  void;
+pub        fn DrawRectangleGradientEx(rec: Rectangle, col1: Color, col2: Color, col3: Color, col4: Color) void {
+    DrawRectangleGradientExShim(&rec, col1, col2, col3, col4);
+}
 pub extern fn DrawRectangleLines(posX: c_int, posY: c_int, width: c_int, height: c_int, color: Color) void;
-pub extern fn DrawRectangleLinesEx(rec: Rectangle, lineThick: c_int, color: Color) void;
-pub extern fn DrawRectangleRounded(rec: Rectangle, roundness: f32, segments: c_int, color: Color) void;
-pub extern fn DrawRectangleRoundedLines(rec: Rectangle, roundness: f32, segments: c_int, lineThick: c_int, color: Color) void;
+pub extern fn DrawRectangleLinesExShim(rec: * const Rectangle, lineThick: c_int, color: Color)  void;
+pub        fn DrawRectangleLinesEx(rec: Rectangle, lineThick: c_int, color: Color) void {
+    DrawRectangleLinesExShim(&rec, lineThick, color);
+}
+pub extern fn DrawRectangleRoundedShim(rec: * const Rectangle, roundness: f32, segments: c_int, color: Color)  void;
+pub        fn DrawRectangleRounded(rec: Rectangle, roundness: f32, segments: c_int, color: Color) void {
+    DrawRectangleRoundedShim(&rec, roundness, segments, color);
+}
+pub extern fn DrawRectangleRoundedLinesShim(rec: * const Rectangle, roundness: f32, segments: c_int, lineThick: c_int, color: Color)  void;
+pub        fn DrawRectangleRoundedLines(rec: Rectangle, roundness: f32, segments: c_int, lineThick: c_int, color: Color) void {
+    DrawRectangleRoundedLinesShim(&rec, roundness, segments, lineThick, color);
+}
 pub extern fn DrawTriangleShim(v1: * const Vector2, v2: * const Vector2, v3: * const Vector2, color: Color)  void;
 pub        fn DrawTriangle(v1: Vector2, v2: Vector2, v3: Vector2, color: Color) void {
     DrawTriangleShim(&v1, &v2, &v3, color);
@@ -1103,19 +1118,25 @@ pub extern fn DrawPolyLinesShim(center: * const Vector2, sides: c_int, radius: f
 pub        fn DrawPolyLines(center: Vector2, sides: c_int, radius: f32, rotation: f32, color: Color) void {
     DrawPolyLinesShim(&center, sides, radius, rotation, color);
 }
-pub extern fn CheckCollisionRecs(rec1: Rectangle, rec2: Rectangle) bool;
+pub extern fn CheckCollisionRecsShim(rec1: * const Rectangle, rec2: * const Rectangle)  bool;
+pub        fn CheckCollisionRecs(rec1: Rectangle, rec2: Rectangle) bool {
+   return  CheckCollisionRecsShim(&rec1, &rec2);
+}
 pub extern fn CheckCollisionCirclesShim(center1: * const Vector2, radius1: f32, center2: * const Vector2, radius2: f32)  bool;
 pub        fn CheckCollisionCircles(center1: Vector2, radius1: f32, center2: Vector2, radius2: f32) bool {
    return  CheckCollisionCirclesShim(&center1, radius1, &center2, radius2);
 }
-pub extern fn CheckCollisionCircleRecShim(center: * const Vector2, radius: f32, rec: Rectangle)  bool;
+pub extern fn CheckCollisionCircleRecShim(center: * const Vector2, radius: f32, rec: * const Rectangle)  bool;
 pub        fn CheckCollisionCircleRec(center: Vector2, radius: f32, rec: Rectangle) bool {
-   return  CheckCollisionCircleRecShim(&center, radius, rec);
+   return  CheckCollisionCircleRecShim(&center, radius, &rec);
 }
-pub extern fn GetCollisionRec(rec1: Rectangle, rec2: Rectangle) Rectangle;
-pub extern fn CheckCollisionPointRecShim(point: * const Vector2, rec: Rectangle)  bool;
+pub extern fn GetCollisionRecShim(rec1: * const Rectangle, rec2: * const Rectangle)  Rectangle;
+pub        fn GetCollisionRec(rec1: Rectangle, rec2: Rectangle) Rectangle {
+   return  GetCollisionRecShim(&rec1, &rec2);
+}
+pub extern fn CheckCollisionPointRecShim(point: * const Vector2, rec: * const Rectangle)  bool;
 pub        fn CheckCollisionPointRec(point: Vector2, rec: Rectangle) bool {
-   return  CheckCollisionPointRecShim(&point, rec);
+   return  CheckCollisionPointRecShim(&point, &rec);
 }
 pub extern fn CheckCollisionPointCircleShim(point: * const Vector2, center: * const Vector2, radius: f32)  bool;
 pub        fn CheckCollisionPointCircle(point: Vector2, center: Vector2, radius: f32) bool {
@@ -1146,14 +1167,20 @@ pub extern fn GetTextureData(texture: Texture2D) Image;
 pub extern fn GetScreenData() Image;
 pub extern fn UpdateTexture(texture: Texture2D, pixels: ?*const c_void) void;
 pub extern fn ImageCopy(image: Image) Image;
-pub extern fn ImageFromImage(image: Image, rec: Rectangle) Image;
+pub extern fn ImageFromImageShim(image: Image, rec: * const Rectangle)  Image;
+pub        fn ImageFromImage(image: Image, rec: Rectangle) Image {
+   return  ImageFromImageShim(image, &rec);
+}
 pub extern fn ImageToPOT(image: [*c]Image, fillColor: Color) void;
 pub extern fn ImageFormat(image: [*c]Image, newFormat: c_int) void;
 pub extern fn ImageAlphaMask(image: [*c]Image, alphaMask: Image) void;
 pub extern fn ImageAlphaClear(image: [*c]Image, color: Color, threshold: f32) void;
 pub extern fn ImageAlphaCrop(image: [*c]Image, threshold: f32) void;
 pub extern fn ImageAlphaPremultiply(image: [*c]Image) void;
-pub extern fn ImageCrop(image: [*c]Image, crop: Rectangle) void;
+pub extern fn ImageCropShim(image: [*c]Image, crop: * const Rectangle)  void;
+pub        fn ImageCrop(image: [*c]Image, crop: Rectangle) void {
+    ImageCropShim(image, &crop);
+}
 pub extern fn ImageResize(image: [*c]Image, newWidth: c_int, newHeight: c_int) void;
 pub extern fn ImageResizeNN(image: [*c]Image, newWidth: c_int, newHeight: c_int) void;
 pub extern fn ImageResizeCanvas(image: [*c]Image, newWidth: c_int, newHeight: c_int, offsetX: c_int, offsetY: c_int, color: Color) void;
@@ -1162,9 +1189,18 @@ pub extern fn ImageDither(image: [*c]Image, rBpp: c_int, gBpp: c_int, bBpp: c_in
 pub extern fn ImageExtractPalette(image: Image, maxPaletteSize: c_int, extractCount: [*c]c_int) [*c]Color;
 pub extern fn ImageText(text: [*c]const u8, fontSize: c_int, color: Color) Image;
 pub extern fn ImageTextEx(font: Font, text: [*c]const u8, fontSize: f32, spacing: f32, tint: Color) Image;
-pub extern fn ImageDraw(dst: [*c]Image, src: Image, srcRec: Rectangle, dstRec: Rectangle, tint: Color) void;
-pub extern fn ImageDrawRectangle(dst: [*c]Image, rec: Rectangle, color: Color) void;
-pub extern fn ImageDrawRectangleLines(dst: [*c]Image, rec: Rectangle, thick: c_int, color: Color) void;
+pub extern fn ImageDrawShim(dst: [*c]Image, src: Image, srcRec: * const Rectangle, dstRec: * const Rectangle, tint: Color)  void;
+pub        fn ImageDraw(dst: [*c]Image, src: Image, srcRec: Rectangle, dstRec: Rectangle, tint: Color) void {
+    ImageDrawShim(dst, src, &srcRec, &dstRec, tint);
+}
+pub extern fn ImageDrawRectangleShim(dst: [*c]Image, rec: * const Rectangle, color: Color)  void;
+pub        fn ImageDrawRectangle(dst: [*c]Image, rec: Rectangle, color: Color) void {
+    ImageDrawRectangleShim(dst, &rec, color);
+}
+pub extern fn ImageDrawRectangleLinesShim(dst: [*c]Image, rec: * const Rectangle, thick: c_int, color: Color)  void;
+pub        fn ImageDrawRectangleLines(dst: [*c]Image, rec: Rectangle, thick: c_int, color: Color) void {
+    ImageDrawRectangleLinesShim(dst, &rec, thick, color);
+}
 pub extern fn ImageDrawTextShim(dst: [*c]Image, position: * const Vector2, text: [*c]const u8, fontSize: c_int, color: Color)  void;
 pub        fn ImageDrawText(dst: [*c]Image, position: Vector2, text: [*c]const u8, fontSize: c_int, color: Color) void {
     ImageDrawTextShim(dst, &position, text, fontSize, color);
@@ -1203,21 +1239,21 @@ pub extern fn DrawTextureExShim(texture: Texture2D, position: * const Vector2, r
 pub        fn DrawTextureEx(texture: Texture2D, position: Vector2, rotation: f32, scale: f32, tint: Color) void {
     DrawTextureExShim(texture, &position, rotation, scale, tint);
 }
-pub extern fn DrawTextureRecShim(texture: Texture2D, sourceRec: Rectangle, position: * const Vector2, tint: Color)  void;
+pub extern fn DrawTextureRecShim(texture: Texture2D, sourceRec: * const Rectangle, position: * const Vector2, tint: Color)  void;
 pub        fn DrawTextureRec(texture: Texture2D, sourceRec: Rectangle, position: Vector2, tint: Color) void {
-    DrawTextureRecShim(texture, sourceRec, &position, tint);
+    DrawTextureRecShim(texture, &sourceRec, &position, tint);
 }
-pub extern fn DrawTextureQuadShim(texture: Texture2D, tiling: * const Vector2, offset: * const Vector2, quad: Rectangle, tint: Color)  void;
+pub extern fn DrawTextureQuadShim(texture: Texture2D, tiling: * const Vector2, offset: * const Vector2, quad: * const Rectangle, tint: Color)  void;
 pub        fn DrawTextureQuad(texture: Texture2D, tiling: Vector2, offset: Vector2, quad: Rectangle, tint: Color) void {
-    DrawTextureQuadShim(texture, &tiling, &offset, quad, tint);
+    DrawTextureQuadShim(texture, &tiling, &offset, &quad, tint);
 }
-pub extern fn DrawTextureProShim(texture: Texture2D, sourceRec: Rectangle, destRec: Rectangle, origin: * const Vector2, rotation: f32, tint: Color)  void;
+pub extern fn DrawTextureProShim(texture: Texture2D, sourceRec: * const Rectangle, destRec: * const Rectangle, origin: * const Vector2, rotation: f32, tint: Color)  void;
 pub        fn DrawTexturePro(texture: Texture2D, sourceRec: Rectangle, destRec: Rectangle, origin: Vector2, rotation: f32, tint: Color) void {
-    DrawTextureProShim(texture, sourceRec, destRec, &origin, rotation, tint);
+    DrawTextureProShim(texture, &sourceRec, &destRec, &origin, rotation, tint);
 }
-pub extern fn DrawTextureNPatchShim(texture: Texture2D, nPatchInfo: NPatchInfo, destRec: Rectangle, origin: * const Vector2, rotation: f32, tint: Color)  void;
+pub extern fn DrawTextureNPatchShim(texture: Texture2D, nPatchInfo: NPatchInfo, destRec: * const Rectangle, origin: * const Vector2, rotation: f32, tint: Color)  void;
 pub        fn DrawTextureNPatch(texture: Texture2D, nPatchInfo: NPatchInfo, destRec: Rectangle, origin: Vector2, rotation: f32, tint: Color) void {
-    DrawTextureNPatchShim(texture, nPatchInfo, destRec, &origin, rotation, tint);
+    DrawTextureNPatchShim(texture, nPatchInfo, &destRec, &origin, rotation, tint);
 }
 pub extern fn GetFontDefault() Font;
 pub extern fn LoadFont(fileName: [*c]const u8) Font;
@@ -1232,8 +1268,14 @@ pub extern fn DrawTextExShim(font: Font, text: [*c]const u8, position: * const V
 pub        fn DrawTextEx(font: Font, text: [*c]const u8, position: Vector2, fontSize: f32, spacing: f32, tint: Color) void {
     DrawTextExShim(font, text, &position, fontSize, spacing, tint);
 }
-pub extern fn DrawTextRec(font: Font, text: [*c]const u8, rec: Rectangle, fontSize: f32, spacing: f32, wordWrap: bool, tint: Color) void;
-pub extern fn DrawTextRecEx(font: Font, text: [*c]const u8, rec: Rectangle, fontSize: f32, spacing: f32, wordWrap: bool, tint: Color, selectStart: c_int, selectLength: c_int, selectTint: Color, selectBackTint: Color) void;
+pub extern fn DrawTextRecShim(font: Font, text: [*c]const u8, rec: * const Rectangle, fontSize: f32, spacing: f32, wordWrap: bool, tint: Color)  void;
+pub        fn DrawTextRec(font: Font, text: [*c]const u8, rec: Rectangle, fontSize: f32, spacing: f32, wordWrap: bool, tint: Color) void {
+    DrawTextRecShim(font, text, &rec, fontSize, spacing, wordWrap, tint);
+}
+pub extern fn DrawTextRecExShim(font: Font, text: [*c]const u8, rec: * const Rectangle, fontSize: f32, spacing: f32, wordWrap: bool, tint: Color, selectStart: c_int, selectLength: c_int, selectTint: Color, selectBackTint: Color)  void;
+pub        fn DrawTextRecEx(font: Font, text: [*c]const u8, rec: Rectangle, fontSize: f32, spacing: f32, wordWrap: bool, tint: Color, selectStart: c_int, selectLength: c_int, selectTint: Color, selectBackTint: Color) void {
+    DrawTextRecExShim(font, text, &rec, fontSize, spacing, wordWrap, tint, selectStart, selectLength, selectTint, selectBackTint);
+}
 pub extern fn DrawTextCodepointShim(font: Font, codepoint: c_int, position: * const Vector2, scale: f32, tint: Color)  void;
 pub        fn DrawTextCodepoint(font: Font, codepoint: c_int, position: Vector2, scale: f32, tint: Color) void {
     DrawTextCodepointShim(font, codepoint, &position, scale, tint);
@@ -1378,9 +1420,9 @@ pub extern fn DrawBillboardShim(camera: Camera, texture: Texture2D, center: * co
 pub        fn DrawBillboard(camera: Camera, texture: Texture2D, center: Vector3, size: f32, tint: Color) void {
     DrawBillboardShim(camera, texture, &center, size, tint);
 }
-pub extern fn DrawBillboardRecShim(camera: Camera, texture: Texture2D, sourceRec: Rectangle, center: * const Vector3, size: f32, tint: Color)  void;
+pub extern fn DrawBillboardRecShim(camera: Camera, texture: Texture2D, sourceRec: * const Rectangle, center: * const Vector3, size: f32, tint: Color)  void;
 pub        fn DrawBillboardRec(camera: Camera, texture: Texture2D, sourceRec: Rectangle, center: Vector3, size: f32, tint: Color) void {
-    DrawBillboardRecShim(camera, texture, sourceRec, &center, size, tint);
+    DrawBillboardRecShim(camera, texture, &sourceRec, &center, size, tint);
 }
 pub extern fn CheckCollisionSpheresShim(centerA: * const Vector3, radiusA: f32, centerB: * const Vector3, radiusB: f32)  bool;
 pub        fn CheckCollisionSpheres(centerA: Vector3, radiusA: f32, centerB: Vector3, radiusB: f32) bool {
@@ -1414,7 +1456,10 @@ pub extern fn GetShaderDefault() Shader;
 pub extern fn GetTextureDefault() Texture2D;
 pub extern fn GetShapesTexture() Texture2D;
 pub extern fn GetShapesTextureRec() Rectangle;
-pub extern fn SetShapesTexture(texture: Texture2D, source: Rectangle) void;
+pub extern fn SetShapesTextureShim(texture: Texture2D, source: * const Rectangle)  void;
+pub        fn SetShapesTexture(texture: Texture2D, source: Rectangle) void {
+    SetShapesTextureShim(texture, &source);
+}
 pub extern fn GetShaderLocation(shader: Shader, uniformName: [*c]const u8) c_int;
 pub extern fn SetShaderValue(shader: Shader, uniformLoc: c_int, value: ?*const c_void, uniformType: c_int) void;
 pub extern fn SetShaderValueV(shader: Shader, uniformLoc: c_int, value: ?*const c_void, uniformType: c_int, count: c_int) void;
@@ -2034,37 +2079,130 @@ pub extern fn GuiFont(font: Font) void;
 pub extern fn GuiFade(alpha: f32) void;
 pub extern fn GuiSetStyle(control: c_int, property: c_int, value: c_int) void;
 pub extern fn GuiGetStyle(control: c_int, property: c_int) c_int;
-pub extern fn GuiWindowBox(bounds: Rectangle, text: [*c]const u8) bool;
-pub extern fn GuiGroupBox(bounds: Rectangle, text: [*c]const u8) void;
-pub extern fn GuiLine(bounds: Rectangle, text: [*c]const u8) void;
-pub extern fn GuiPanel(bounds: Rectangle) void;
-pub extern fn GuiScrollPanel(bounds: Rectangle, content: Rectangle, scroll: [*c]Vector2) Rectangle;
-pub extern fn GuiLabel(bounds: Rectangle, text: [*c]const u8) void;
-pub extern fn GuiButton(bounds: Rectangle, text: [*c]const u8) bool;
-pub extern fn GuiLabelButton(bounds: Rectangle, text: [*c]const u8) bool;
-pub extern fn GuiImageButton(bounds: Rectangle, texture: Texture2D) bool;
-pub extern fn GuiImageButtonEx(bounds: Rectangle, texture: Texture2D, texSource: Rectangle, text: [*c]const u8) bool;
-pub extern fn GuiToggle(bounds: Rectangle, text: [*c]const u8, active: bool) bool;
-pub extern fn GuiToggleGroup(bounds: Rectangle, text: [*c]const u8, active: c_int) c_int;
-pub extern fn GuiCheckBox(bounds: Rectangle, text: [*c]const u8, checked: bool) bool;
-pub extern fn GuiComboBox(bounds: Rectangle, text: [*c]const u8, active: c_int) c_int;
-pub extern fn GuiDropdownBox(bounds: Rectangle, text: [*c]const u8, active: [*c]c_int, editMode: bool) bool;
-pub extern fn GuiSpinner(bounds: Rectangle, value: [*c]c_int, minValue: c_int, maxValue: c_int, editMode: bool) bool;
-pub extern fn GuiValueBox(bounds: Rectangle, value: [*c]c_int, minValue: c_int, maxValue: c_int, editMode: bool) bool;
-pub extern fn GuiTextBox(bounds: Rectangle, text: [*c]u8, textSize: c_int, editMode: bool) bool;
-pub extern fn GuiTextBoxMulti(bounds: Rectangle, text: [*c]u8, textSize: c_int, editMode: bool) bool;
-pub extern fn GuiSlider(bounds: Rectangle, text: [*c]const u8, value: f32, minValue: f32, maxValue: f32, showValue: bool) f32;
-pub extern fn GuiSliderBar(bounds: Rectangle, text: [*c]const u8, value: f32, minValue: f32, maxValue: f32, showValue: bool) f32;
-pub extern fn GuiProgressBar(bounds: Rectangle, text: [*c]const u8, value: f32, minValue: f32, maxValue: f32, showValue: bool) f32;
-pub extern fn GuiStatusBar(bounds: Rectangle, text: [*c]const u8) void;
-pub extern fn GuiDummyRec(bounds: Rectangle, text: [*c]const u8) void;
-pub extern fn GuiScrollBar(bounds: Rectangle, value: c_int, minValue: c_int, maxValue: c_int) c_int;
-pub extern fn GuiGrid(bounds: Rectangle, spacing: f32, subdivs: c_int) Vector2;
-pub extern fn GuiListView(bounds: Rectangle, text: [*c]const u8, active: [*c]c_int, scrollIndex: [*c]c_int, editMode: bool) bool;
-pub extern fn GuiListViewEx(bounds: Rectangle, text: [*c][*c]const u8, count: c_int, enabled: [*c]c_int, active: [*c]c_int, focus: [*c]c_int, scrollIndex: [*c]c_int, editMode: bool) bool;
-pub extern fn GuiMessageBox(bounds: Rectangle, windowTitle: [*c]const u8, message: [*c]const u8, buttons: [*c]const u8) c_int;
-pub extern fn GuiTextInputBox(bounds: Rectangle, windowTitle: [*c]const u8, message: [*c]const u8, text: [*c]u8, buttons: [*c]const u8) c_int;
-pub extern fn GuiColorPicker(bounds: Rectangle, color: Color) Color;
+pub extern fn GuiWindowBoxShim(bounds: * const Rectangle, text: [*c]const u8)  bool;
+pub        fn GuiWindowBox(bounds: Rectangle, text: [*c]const u8) bool {
+   return  GuiWindowBoxShim(&bounds, text);
+}
+pub extern fn GuiGroupBoxShim(bounds: * const Rectangle, text: [*c]const u8)  void;
+pub        fn GuiGroupBox(bounds: Rectangle, text: [*c]const u8) void {
+    GuiGroupBoxShim(&bounds, text);
+}
+pub extern fn GuiLineShim(bounds: * const Rectangle, text: [*c]const u8)  void;
+pub        fn GuiLine(bounds: Rectangle, text: [*c]const u8) void {
+    GuiLineShim(&bounds, text);
+}
+pub extern fn GuiPanelShim(bounds: * const Rectangle)  void;
+pub        fn GuiPanel(bounds: Rectangle) void {
+    GuiPanelShim(&bounds);
+}
+pub extern fn GuiScrollPanelShim(bounds: * const Rectangle, content: * const Rectangle, scroll: [*c]Vector2)  Rectangle;
+pub        fn GuiScrollPanel(bounds: Rectangle, content: Rectangle, scroll: [*c]Vector2) Rectangle {
+   return  GuiScrollPanelShim(&bounds, &content, scroll);
+}
+pub extern fn GuiLabelShim(bounds: * const Rectangle, text: [*c]const u8)  void;
+pub        fn GuiLabel(bounds: Rectangle, text: [*c]const u8) void {
+    GuiLabelShim(&bounds, text);
+}
+pub extern fn GuiButtonShim(bounds: * const Rectangle, text: [*c]const u8)  bool;
+pub        fn GuiButton(bounds: Rectangle, text: [*c]const u8) bool {
+   return  GuiButtonShim(&bounds, text);
+}
+pub extern fn GuiLabelButtonShim(bounds: * const Rectangle, text: [*c]const u8)  bool;
+pub        fn GuiLabelButton(bounds: Rectangle, text: [*c]const u8) bool {
+   return  GuiLabelButtonShim(&bounds, text);
+}
+pub extern fn GuiImageButtonShim(bounds: * const Rectangle, texture: Texture2D)  bool;
+pub        fn GuiImageButton(bounds: Rectangle, texture: Texture2D) bool {
+   return  GuiImageButtonShim(&bounds, texture);
+}
+pub extern fn GuiImageButtonExShim(bounds: * const Rectangle, texture: Texture2D, texSource: * const Rectangle, text: [*c]const u8)  bool;
+pub        fn GuiImageButtonEx(bounds: Rectangle, texture: Texture2D, texSource: Rectangle, text: [*c]const u8) bool {
+   return  GuiImageButtonExShim(&bounds, texture, &texSource, text);
+}
+pub extern fn GuiToggleShim(bounds: * const Rectangle, text: [*c]const u8, active: bool)  bool;
+pub        fn GuiToggle(bounds: Rectangle, text: [*c]const u8, active: bool) bool {
+   return  GuiToggleShim(&bounds, text, active);
+}
+pub extern fn GuiToggleGroupShim(bounds: * const Rectangle, text: [*c]const u8, active: c_int)  c_int;
+pub        fn GuiToggleGroup(bounds: Rectangle, text: [*c]const u8, active: c_int) c_int {
+   return  GuiToggleGroupShim(&bounds, text, active);
+}
+pub extern fn GuiCheckBoxShim(bounds: * const Rectangle, text: [*c]const u8, checked: bool)  bool;
+pub        fn GuiCheckBox(bounds: Rectangle, text: [*c]const u8, checked: bool) bool {
+   return  GuiCheckBoxShim(&bounds, text, checked);
+}
+pub extern fn GuiComboBoxShim(bounds: * const Rectangle, text: [*c]const u8, active: c_int)  c_int;
+pub        fn GuiComboBox(bounds: Rectangle, text: [*c]const u8, active: c_int) c_int {
+   return  GuiComboBoxShim(&bounds, text, active);
+}
+pub extern fn GuiDropdownBoxShim(bounds: * const Rectangle, text: [*c]const u8, active: [*c]c_int, editMode: bool)  bool;
+pub        fn GuiDropdownBox(bounds: Rectangle, text: [*c]const u8, active: [*c]c_int, editMode: bool) bool {
+   return  GuiDropdownBoxShim(&bounds, text, active, editMode);
+}
+pub extern fn GuiSpinnerShim(bounds: * const Rectangle, value: [*c]c_int, minValue: c_int, maxValue: c_int, editMode: bool)  bool;
+pub        fn GuiSpinner(bounds: Rectangle, value: [*c]c_int, minValue: c_int, maxValue: c_int, editMode: bool) bool {
+   return  GuiSpinnerShim(&bounds, value, minValue, maxValue, editMode);
+}
+pub extern fn GuiValueBoxShim(bounds: * const Rectangle, value: [*c]c_int, minValue: c_int, maxValue: c_int, editMode: bool)  bool;
+pub        fn GuiValueBox(bounds: Rectangle, value: [*c]c_int, minValue: c_int, maxValue: c_int, editMode: bool) bool {
+   return  GuiValueBoxShim(&bounds, value, minValue, maxValue, editMode);
+}
+pub extern fn GuiTextBoxShim(bounds: * const Rectangle, text: [*c]u8, textSize: c_int, editMode: bool)  bool;
+pub        fn GuiTextBox(bounds: Rectangle, text: [*c]u8, textSize: c_int, editMode: bool) bool {
+   return  GuiTextBoxShim(&bounds, text, textSize, editMode);
+}
+pub extern fn GuiTextBoxMultiShim(bounds: * const Rectangle, text: [*c]u8, textSize: c_int, editMode: bool)  bool;
+pub        fn GuiTextBoxMulti(bounds: Rectangle, text: [*c]u8, textSize: c_int, editMode: bool) bool {
+   return  GuiTextBoxMultiShim(&bounds, text, textSize, editMode);
+}
+pub extern fn GuiSliderShim(bounds: * const Rectangle, text: [*c]const u8, value: f32, minValue: f32, maxValue: f32, showValue: bool)  f32;
+pub        fn GuiSlider(bounds: Rectangle, text: [*c]const u8, value: f32, minValue: f32, maxValue: f32, showValue: bool) f32 {
+   return  GuiSliderShim(&bounds, text, value, minValue, maxValue, showValue);
+}
+pub extern fn GuiSliderBarShim(bounds: * const Rectangle, text: [*c]const u8, value: f32, minValue: f32, maxValue: f32, showValue: bool)  f32;
+pub        fn GuiSliderBar(bounds: Rectangle, text: [*c]const u8, value: f32, minValue: f32, maxValue: f32, showValue: bool) f32 {
+   return  GuiSliderBarShim(&bounds, text, value, minValue, maxValue, showValue);
+}
+pub extern fn GuiProgressBarShim(bounds: * const Rectangle, text: [*c]const u8, value: f32, minValue: f32, maxValue: f32, showValue: bool)  f32;
+pub        fn GuiProgressBar(bounds: Rectangle, text: [*c]const u8, value: f32, minValue: f32, maxValue: f32, showValue: bool) f32 {
+   return  GuiProgressBarShim(&bounds, text, value, minValue, maxValue, showValue);
+}
+pub extern fn GuiStatusBarShim(bounds: * const Rectangle, text: [*c]const u8)  void;
+pub        fn GuiStatusBar(bounds: Rectangle, text: [*c]const u8) void {
+    GuiStatusBarShim(&bounds, text);
+}
+pub extern fn GuiDummyRecShim(bounds: * const Rectangle, text: [*c]const u8)  void;
+pub        fn GuiDummyRec(bounds: Rectangle, text: [*c]const u8) void {
+    GuiDummyRecShim(&bounds, text);
+}
+pub extern fn GuiScrollBarShim(bounds: * const Rectangle, value: c_int, minValue: c_int, maxValue: c_int)  c_int;
+pub        fn GuiScrollBar(bounds: Rectangle, value: c_int, minValue: c_int, maxValue: c_int) c_int {
+   return  GuiScrollBarShim(&bounds, value, minValue, maxValue);
+}
+pub extern fn GuiGridShim(bounds: * const Rectangle, spacing: f32, subdivs: c_int)  Vector2;
+pub        fn GuiGrid(bounds: Rectangle, spacing: f32, subdivs: c_int) Vector2 {
+   return  GuiGridShim(&bounds, spacing, subdivs);
+}
+pub extern fn GuiListViewShim(bounds: * const Rectangle, text: [*c]const u8, active: [*c]c_int, scrollIndex: [*c]c_int, editMode: bool)  bool;
+pub        fn GuiListView(bounds: Rectangle, text: [*c]const u8, active: [*c]c_int, scrollIndex: [*c]c_int, editMode: bool) bool {
+   return  GuiListViewShim(&bounds, text, active, scrollIndex, editMode);
+}
+pub extern fn GuiListViewExShim(bounds: * const Rectangle, text: [*c][*c]const u8, count: c_int, enabled: [*c]c_int, active: [*c]c_int, focus: [*c]c_int, scrollIndex: [*c]c_int, editMode: bool)  bool;
+pub        fn GuiListViewEx(bounds: Rectangle, text: [*c][*c]const u8, count: c_int, enabled: [*c]c_int, active: [*c]c_int, focus: [*c]c_int, scrollIndex: [*c]c_int, editMode: bool) bool {
+   return  GuiListViewExShim(&bounds, text, count, enabled, active, focus, scrollIndex, editMode);
+}
+pub extern fn GuiMessageBoxShim(bounds: * const Rectangle, windowTitle: [*c]const u8, message: [*c]const u8, buttons: [*c]const u8)  c_int;
+pub        fn GuiMessageBox(bounds: Rectangle, windowTitle: [*c]const u8, message: [*c]const u8, buttons: [*c]const u8) c_int {
+   return  GuiMessageBoxShim(&bounds, windowTitle, message, buttons);
+}
+pub extern fn GuiTextInputBoxShim(bounds: * const Rectangle, windowTitle: [*c]const u8, message: [*c]const u8, text: [*c]u8, buttons: [*c]const u8)  c_int;
+pub        fn GuiTextInputBox(bounds: Rectangle, windowTitle: [*c]const u8, message: [*c]const u8, text: [*c]u8, buttons: [*c]const u8) c_int {
+   return  GuiTextInputBoxShim(&bounds, windowTitle, message, text, buttons);
+}
+pub extern fn GuiColorPickerShim(bounds: * const Rectangle, color: Color)  Color;
+pub        fn GuiColorPicker(bounds: Rectangle, color: Color) Color {
+   return  GuiColorPickerShim(&bounds, color);
+}
 pub extern fn GuiLoadStyle(fileName: [*c]const u8) void;
 pub extern fn GuiLoadStyleProps(props: [*c]const c_int, count: c_int) void;
 pub extern fn GuiLoadStyleDefault() void;

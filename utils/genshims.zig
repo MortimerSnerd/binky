@@ -16,7 +16,7 @@ const ArrayList = std.ArrayList;
 // Not a hardship, as raylib doesn't have a lot of types.
 const BadTypes =  [_][]const u8 {
   // Struct passed by value <= 16 bytes.
-  "Vector2", "Vector3", "Vector4",
+  "Vector2", "Vector3", "Vector4", "Rectangle"
 };
 
 pub fn main() !void {

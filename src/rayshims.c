@@ -69,9 +69,29 @@ void DrawRectangleVShim(Vector2 const* position, Vector2 const* size, Color colo
 {
     DrawRectangleV(*position, *size, color);
 }
-void DrawRectangleProShim(Rectangle rec, Vector2 const* origin, float rotation, Color color)
+void DrawRectangleRecShim(Rectangle const* rec, Color color)
 {
-    DrawRectanglePro(rec, *origin, rotation, color);
+    DrawRectangleRec(*rec, color);
+}
+void DrawRectangleProShim(Rectangle const* rec, Vector2 const* origin, float rotation, Color color)
+{
+    DrawRectanglePro(*rec, *origin, rotation, color);
+}
+void DrawRectangleGradientExShim(Rectangle const* rec, Color col1, Color col2, Color col3, Color col4)
+{
+    DrawRectangleGradientEx(*rec, col1, col2, col3, col4);
+}
+void DrawRectangleLinesExShim(Rectangle const* rec, int lineThick, Color color)
+{
+    DrawRectangleLinesEx(*rec, lineThick, color);
+}
+void DrawRectangleRoundedShim(Rectangle const* rec, float roundness, int segments, Color color)
+{
+    DrawRectangleRounded(*rec, roundness, segments, color);
+}
+void DrawRectangleRoundedLinesShim(Rectangle const* rec, float roundness, int segments, int lineThick, Color color)
+{
+    DrawRectangleRoundedLines(*rec, roundness, segments, lineThick, color);
 }
 void DrawTriangleShim(Vector2 const* v1, Vector2 const* v2, Vector2 const* v3, Color color)
 {
@@ -89,17 +109,25 @@ void DrawPolyLinesShim(Vector2 const* center, int sides, float radius, float rot
 {
     DrawPolyLines(*center, sides, radius, rotation, color);
 }
+bool CheckCollisionRecsShim(Rectangle const* rec1, Rectangle const* rec2)
+{
+    return CheckCollisionRecs(*rec1, *rec2);
+}
 bool CheckCollisionCirclesShim(Vector2 const* center1, float radius1, Vector2 const* center2, float radius2)
 {
     return CheckCollisionCircles(*center1, radius1, *center2, radius2);
 }
-bool CheckCollisionCircleRecShim(Vector2 const* center, float radius, Rectangle rec)
+bool CheckCollisionCircleRecShim(Vector2 const* center, float radius, Rectangle const* rec)
 {
-    return CheckCollisionCircleRec(*center, radius, rec);
+    return CheckCollisionCircleRec(*center, radius, *rec);
 }
-bool CheckCollisionPointRecShim(Vector2 const* point, Rectangle rec)
+Rectangle GetCollisionRecShim(Rectangle const* rec1, Rectangle const* rec2)
 {
-    return CheckCollisionPointRec(*point, rec);
+    return GetCollisionRec(*rec1, *rec2);
+}
+bool CheckCollisionPointRecShim(Vector2 const* point, Rectangle const* rec)
+{
+    return CheckCollisionPointRec(*point, *rec);
 }
 bool CheckCollisionPointCircleShim(Vector2 const* point, Vector2 const* center, float radius)
 {
@@ -108,6 +136,26 @@ bool CheckCollisionPointCircleShim(Vector2 const* point, Vector2 const* center, 
 bool CheckCollisionPointTriangleShim(Vector2 const* point, Vector2 const* p1, Vector2 const* p2, Vector2 const* p3)
 {
     return CheckCollisionPointTriangle(*point, *p1, *p2, *p3);
+}
+Image ImageFromImageShim(Image image, Rectangle const* rec)
+{
+    return ImageFromImage(image, *rec);
+}
+void ImageCropShim(Image* image, Rectangle const* crop)
+{
+    ImageCrop(image, *crop);
+}
+void ImageDrawShim(Image* dst, Image src, Rectangle const* srcRec, Rectangle const* dstRec, Color tint)
+{
+    ImageDraw(dst, src, *srcRec, *dstRec, tint);
+}
+void ImageDrawRectangleShim(Image* dst, Rectangle const* rec, Color color)
+{
+    ImageDrawRectangle(dst, *rec, color);
+}
+void ImageDrawRectangleLinesShim(Image* dst, Rectangle const* rec, int thick, Color color)
+{
+    ImageDrawRectangleLines(dst, *rec, thick, color);
 }
 void ImageDrawTextShim(Image* dst, Vector2 const* position, const char* text, int fontSize, Color color)
 {
@@ -125,25 +173,33 @@ void DrawTextureExShim(Texture2D texture, Vector2 const* position, float rotatio
 {
     DrawTextureEx(texture, *position, rotation, scale, tint);
 }
-void DrawTextureRecShim(Texture2D texture, Rectangle sourceRec, Vector2 const* position, Color tint)
+void DrawTextureRecShim(Texture2D texture, Rectangle const* sourceRec, Vector2 const* position, Color tint)
 {
-    DrawTextureRec(texture, sourceRec, *position, tint);
+    DrawTextureRec(texture, *sourceRec, *position, tint);
 }
-void DrawTextureQuadShim(Texture2D texture, Vector2 const* tiling, Vector2 const* offset, Rectangle quad, Color tint)
+void DrawTextureQuadShim(Texture2D texture, Vector2 const* tiling, Vector2 const* offset, Rectangle const* quad, Color tint)
 {
-    DrawTextureQuad(texture, *tiling, *offset, quad, tint);
+    DrawTextureQuad(texture, *tiling, *offset, *quad, tint);
 }
-void DrawTextureProShim(Texture2D texture, Rectangle sourceRec, Rectangle destRec, Vector2 const* origin, float rotation, Color tint)
+void DrawTextureProShim(Texture2D texture, Rectangle const* sourceRec, Rectangle const* destRec, Vector2 const* origin, float rotation, Color tint)
 {
-    DrawTexturePro(texture, sourceRec, destRec, *origin, rotation, tint);
+    DrawTexturePro(texture, *sourceRec, *destRec, *origin, rotation, tint);
 }
-void DrawTextureNPatchShim(Texture2D texture, NPatchInfo nPatchInfo, Rectangle destRec, Vector2 const* origin, float rotation, Color tint)
+void DrawTextureNPatchShim(Texture2D texture, NPatchInfo nPatchInfo, Rectangle const* destRec, Vector2 const* origin, float rotation, Color tint)
 {
-    DrawTextureNPatch(texture, nPatchInfo, destRec, *origin, rotation, tint);
+    DrawTextureNPatch(texture, nPatchInfo, *destRec, *origin, rotation, tint);
 }
 void DrawTextExShim(Font font, const char* text, Vector2 const* position, float fontSize, float spacing, Color tint)
 {
     DrawTextEx(font, text, *position, fontSize, spacing, tint);
+}
+void DrawTextRecShim(Font font, const char* text, Rectangle const* rec, float fontSize, float spacing, bool wordWrap, Color tint)
+{
+    DrawTextRec(font, text, *rec, fontSize, spacing, wordWrap, tint);
+}
+void DrawTextRecExShim(Font font, const char* text, Rectangle const* rec, float fontSize, float spacing, bool wordWrap, Color tint, int selectStart, int selectLength, Color selectTint, Color selectBackTint)
+{
+    DrawTextRecEx(font, text, *rec, fontSize, spacing, wordWrap, tint, selectStart, selectLength, selectTint, selectBackTint);
 }
 void DrawTextCodepointShim(Font font, int codepoint, Vector2 const* position, float scale, Color tint)
 {
@@ -237,9 +293,9 @@ void DrawBillboardShim(Camera camera, Texture2D texture, Vector3 const* center, 
 {
     DrawBillboard(camera, texture, *center, size, tint);
 }
-void DrawBillboardRecShim(Camera camera, Texture2D texture, Rectangle sourceRec, Vector3 const* center, float size, Color tint)
+void DrawBillboardRecShim(Camera camera, Texture2D texture, Rectangle const* sourceRec, Vector3 const* center, float size, Color tint)
 {
-    DrawBillboardRec(camera, texture, sourceRec, *center, size, tint);
+    DrawBillboardRec(camera, texture, *sourceRec, *center, size, tint);
 }
 bool CheckCollisionSpheresShim(Vector3 const* centerA, float radiusA, Vector3 const* centerB, float radiusB)
 {
@@ -260,6 +316,134 @@ bool CheckCollisionRaySphereExShim(Ray ray, Vector3 const* center, float radius,
 RayHitInfo GetCollisionRayTriangleShim(Ray ray, Vector3 const* p1, Vector3 const* p2, Vector3 const* p3)
 {
     return GetCollisionRayTriangle(ray, *p1, *p2, *p3);
+}
+void SetShapesTextureShim(Texture2D texture, Rectangle const* source)
+{
+    SetShapesTexture(texture, *source);
+}
+bool GuiWindowBoxShim(Rectangle const* bounds, const char* text)
+{
+    return GuiWindowBox(*bounds, text);
+}
+void GuiGroupBoxShim(Rectangle const* bounds, const char* text)
+{
+    GuiGroupBox(*bounds, text);
+}
+void GuiLineShim(Rectangle const* bounds, const char* text)
+{
+    GuiLine(*bounds, text);
+}
+void GuiPanelShim(Rectangle const* bounds)
+{
+    GuiPanel(*bounds);
+}
+Rectangle GuiScrollPanelShim(Rectangle const* bounds, Rectangle const* content, Vector2* scroll)
+{
+    return GuiScrollPanel(*bounds, *content, scroll);
+}
+void GuiLabelShim(Rectangle const* bounds, const char* text)
+{
+    GuiLabel(*bounds, text);
+}
+bool GuiButtonShim(Rectangle const* bounds, const char* text)
+{
+    return GuiButton(*bounds, text);
+}
+bool GuiLabelButtonShim(Rectangle const* bounds, const char* text)
+{
+    return GuiLabelButton(*bounds, text);
+}
+bool GuiImageButtonShim(Rectangle const* bounds, Texture2D texture)
+{
+    return GuiImageButton(*bounds, texture);
+}
+bool GuiImageButtonExShim(Rectangle const* bounds, Texture2D texture, Rectangle const* texSource, const char* text)
+{
+    return GuiImageButtonEx(*bounds, texture, *texSource, text);
+}
+bool GuiToggleShim(Rectangle const* bounds, const char* text, bool active)
+{
+    return GuiToggle(*bounds, text, active);
+}
+int GuiToggleGroupShim(Rectangle const* bounds, const char* text, int active)
+{
+    return GuiToggleGroup(*bounds, text, active);
+}
+bool GuiCheckBoxShim(Rectangle const* bounds, const char* text, bool checked)
+{
+    return GuiCheckBox(*bounds, text, checked);
+}
+int GuiComboBoxShim(Rectangle const* bounds, const char* text, int active)
+{
+    return GuiComboBox(*bounds, text, active);
+}
+bool GuiDropdownBoxShim(Rectangle const* bounds, const char* text, int* active, bool editMode)
+{
+    return GuiDropdownBox(*bounds, text, active, editMode);
+}
+bool GuiSpinnerShim(Rectangle const* bounds, int* value, int minValue, int maxValue, bool editMode)
+{
+    return GuiSpinner(*bounds, value, minValue, maxValue, editMode);
+}
+bool GuiValueBoxShim(Rectangle const* bounds, int* value, int minValue, int maxValue, bool editMode)
+{
+    return GuiValueBox(*bounds, value, minValue, maxValue, editMode);
+}
+bool GuiTextBoxShim(Rectangle const* bounds, char* text, int textSize, bool editMode)
+{
+    return GuiTextBox(*bounds, text, textSize, editMode);
+}
+bool GuiTextBoxMultiShim(Rectangle const* bounds, char* text, int textSize, bool editMode)
+{
+    return GuiTextBoxMulti(*bounds, text, textSize, editMode);
+}
+float GuiSliderShim(Rectangle const* bounds, const char* text, float value, float minValue, float maxValue, bool showValue)
+{
+    return GuiSlider(*bounds, text, value, minValue, maxValue, showValue);
+}
+float GuiSliderBarShim(Rectangle const* bounds, const char* text, float value, float minValue, float maxValue, bool showValue)
+{
+    return GuiSliderBar(*bounds, text, value, minValue, maxValue, showValue);
+}
+float GuiProgressBarShim(Rectangle const* bounds, const char* text, float value, float minValue, float maxValue, bool showValue)
+{
+    return GuiProgressBar(*bounds, text, value, minValue, maxValue, showValue);
+}
+void GuiStatusBarShim(Rectangle const* bounds, const char* text)
+{
+    GuiStatusBar(*bounds, text);
+}
+void GuiDummyRecShim(Rectangle const* bounds, const char* text)
+{
+    GuiDummyRec(*bounds, text);
+}
+int GuiScrollBarShim(Rectangle const* bounds, int value, int minValue, int maxValue)
+{
+    return GuiScrollBar(*bounds, value, minValue, maxValue);
+}
+Vector2 GuiGridShim(Rectangle const* bounds, float spacing, int subdivs)
+{
+    return GuiGrid(*bounds, spacing, subdivs);
+}
+bool GuiListViewShim(Rectangle const* bounds, const char* text, int* active, int* scrollIndex, bool editMode)
+{
+    return GuiListView(*bounds, text, active, scrollIndex, editMode);
+}
+bool GuiListViewExShim(Rectangle const* bounds, const char** text, int count, int* enabled, int* active, int* focus, int* scrollIndex, bool editMode)
+{
+    return GuiListViewEx(*bounds, text, count, enabled, active, focus, scrollIndex, editMode);
+}
+int GuiMessageBoxShim(Rectangle const* bounds, const char* windowTitle, const char* message, const char* buttons)
+{
+    return GuiMessageBox(*bounds, windowTitle, message, buttons);
+}
+int GuiTextInputBoxShim(Rectangle const* bounds, const char* windowTitle, const char* message, char* text, const char* buttons)
+{
+    return GuiTextInputBox(*bounds, windowTitle, message, text, buttons);
+}
+Color GuiColorPickerShim(Rectangle const* bounds, Color color)
+{
+    return GuiColorPicker(*bounds, color);
 }
 PhysicsBody CreatePhysicsBodyCircleShim(Vector2 const* pos, float radius, float density)
 {

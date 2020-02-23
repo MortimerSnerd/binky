@@ -15,921 +15,494 @@ const rl = @import("raylib");
 pub fn main() void {
     warn("This file isn't really executable, it's just a compile test.\nPrepare to explode.\n", .{});
 
+    // Vars we can pass to functions without specifying data members.
+    var npatch: rl.NPatchInfo = undefined;
+    var body: rl.PhysicsBody = undefined;
+    var modelAnimation: rl.ModelAnimation = undefined;
+    var astream: rl.AudioStream = undefined;
+    var wave: rl.Wave = undefined;
+    var music: rl.Music = undefined;
+    var sound: rl.Sound = undefined;
+    var vrdi: rl.VrDeviceInfo = undefined;
+    var shader: rl.Shader = undefined;
+    var matrix: rl.Matrix = undefined;
+    var bb: rl.BoundingBox = undefined;
+    var mat: rl.Material = undefined;
+    var model: rl.Model = undefined;
+    var mesh: rl.Mesh = undefined;
+    var ray: rl.Ray = undefined;
+    var font: rl.Font = undefined;
     var rect: rl.Rectangle = undefined;
     var tlc: rl.TraceLogCallback = undefined;
     var rtext: rl.RenderTexture2D = undefined;
     var cam2: rl.Camera2D = undefined;
     var cam3: rl.Camera3D = undefined;
     var v2: rl.Vector2 = undefined;
+    var v3: rl.Vector3 = undefined;
+    var v4: rl.Vector4 = undefined;
     var color: rl.Color = undefined;
     const string = "bork";
     var image: rl.Image = undefined;
     var txt: rl.Texture2D = undefined;
 
-    rl.DrawCircleV(v2, 1.0, color);
-    rl.InitWindow(100, 100, "test");
-    _ = rl.WindowShouldClose();
-    rl.CloseWindow();
-    _ = rl.IsWindowReady();
-    _ = rl.IsWindowMinimized();
-    _ = rl.IsWindowResized();
-    _ = rl.IsWindowHidden();
-    _ = rl.IsCursorHidden();
-    _ = rl.IsFileDropped();
-    _ = rl.IsVrSimulatorReady();
-    _ = rl.IsAudioDeviceReady();
-    _ = rl.IsPhysicsEnabled();
-    _ = rl.WindowShouldClose();
-    _ = rl.IsWindowReady();
-    _ = rl.IsWindowMinimized();
-    _ = rl.IsWindowResized();
-    _ = rl.IsWindowHidden();
-    _ = rl.IsCursorHidden();
-    _ = rl.IsFileDropped();
-    _ = rl.IsVrSimulatorReady();
-    _ = rl.IsAudioDeviceReady();
-    _ = rl.IsPhysicsEnabled();
-    rl.ToggleFullscreen();
-    rl.UnhideWindow();
-    rl.HideWindow();
-    rl.ShowCursor();
-    rl.HideCursor();
-    rl.EnableCursor();
-    rl.DisableCursor();
+    rl.BeginBlendMode(1);
     rl.BeginDrawing();
-    rl.EndDrawing();
-    rl.EndMode2D();
-    rl.EndMode3D();
-    rl.EndTextureMode();
-    rl.EndScissorMode();
-    rl.ClearDirectoryFiles();
-    rl.ClearDroppedFiles();
-    rl.EndShaderMode();
-    rl.EndBlendMode();
-    rl.InitVrSimulator();
-    rl.CloseVrSimulator();
-    rl.ToggleVrMode();
-    rl.BeginVrDrawing();
-    rl.EndVrDrawing();
-    rl.InitAudioDevice();
-    rl.CloseAudioDevice();
-    rl.StopSoundMulti();
-    rl.GuiEnable();
-    rl.GuiDisable();
-    rl.GuiLock();
-    rl.GuiUnlock();
-    rl.GuiLoadStyleDefault();
-    rl.GuiUpdateStyleComplete();
-    rl.InitPhysics();
-    rl.RunPhysicsStep();
-    rl.ResetPhysics();
-    rl.ClosePhysics();
-    rl.CloseWindow();
-    rl.ToggleFullscreen();
-    rl.UnhideWindow();
-    rl.HideWindow();
-    rl.ShowCursor();
-    rl.HideCursor();
-    rl.EnableCursor();
-    rl.DisableCursor();
-    rl.BeginDrawing();
-    rl.EndDrawing();
-    rl.EndMode2D();
-    rl.EndMode3D();
-    rl.EndTextureMode();
-    rl.EndScissorMode();
-    rl.ClearDirectoryFiles();
-    rl.ClearDroppedFiles();
-    rl.EndShaderMode();
-    rl.EndBlendMode();
-    rl.InitVrSimulator();
-    rl.CloseVrSimulator();
-    rl.ToggleVrMode();
-    rl.BeginVrDrawing();
-    rl.EndVrDrawing();
-    rl.InitAudioDevice();
-    rl.CloseAudioDevice();
-    rl.StopSoundMulti();
-    rl.GuiEnable();
-    rl.GuiDisable();
-    rl.GuiLock();
-    rl.GuiUnlock();
-    rl.GuiLoadStyleDefault();
-    rl.GuiUpdateStyleComplete();
-    rl.InitPhysics();
-    rl.RunPhysicsStep();
-    rl.ResetPhysics();
-    rl.ClosePhysics();
-    rl.SetWindowIcon(image);
-    rl.SetWindowTitle(string);
-    rl.SetWindowPosition(1, 1);
-    rl.SetWindowMonitor(1);
-    rl.SetWindowMinSize(1, 1);
-    rl.SetWindowSize(1, 1);
-    rl.SetClipboardText(string);
-    rl.ClearBackground(color);
     rl.BeginMode2D(cam2);
     rl.BeginMode3D(cam3);
-    rl.BeginTextureMode(rtext);
     rl.BeginScissorMode(1, 1, 1, 1);
-    rl.SetTargetFPS(1);
-    rl.SetConfigFlags(1);
-    rl.SetTraceLogLevel(1);
-    rl.SetTraceLogExit(1);
-    rl.SetTraceLogCallback(tlc);
-    rl.TakeScreenshot(string);
-    rl.StorageSaveValue(1, 1);
-    rl.OpenURL(string);
-    rl.SetExitKey(1);
-    rl.SetMousePosition(1, 1);
-    rl.SetMouseOffset(1, 1);
-    rl.SetMouseScale(1.0, 1.0);
-    rl.SetGesturesEnabled(1);
-    rl.SetCameraMode(cam3, 1);
-    rl.UpdateCamera(&cam3);
-    rl.SetCameraPanControl(1);
-    rl.SetCameraAltControl(1);
-    rl.SetCameraSmoothZoomControl(1);
-    rl.SetCameraMoveControls(1, 1, 1, 1, 1, 1);
-    rl.DrawPixel(1, 1, color);
-    rl.DrawLine(1, 1, 1, 1, color);
-    rl.DrawLineStrip(&v2, 1, color);
+    rl.BeginShaderMode(shader);
+    rl.BeginTextureMode(rtext);
+    rl.BeginVrDrawing();
+    _ = rl.CheckCollisionBoxSphere(bb, v3, 1.0);
+    _ = rl.CheckCollisionCircleRec(v2, 1.0, rect);
+    _ = rl.CheckCollisionCircles(v2, 1.0, v2, 1.0);
+    _ = rl.CheckCollisionPointCircle(v2, v2, 1.0);
+    _ = rl.CheckCollisionPointRec(v2, rect);
+    _ = rl.CheckCollisionPointTriangle(v2, v2, v2, v2);
+    _ = rl.CheckCollisionRaySphereEx(ray, v3, 1.0, null);
+    _ = rl.CheckCollisionRaySphere(ray, v3, 1.0);
+    _ = rl.CheckCollisionSpheres(v3, 1.0, v3, 1.0);
+    rl.ClearBackground(color);
+    rl.ClearDirectoryFiles();
+    rl.ClearDroppedFiles();
+    rl.CloseAudioDevice();
+    rl.CloseAudioStream(astream);
+    rl.ClosePhysics();
+    rl.CloseVrSimulator();
+    rl.CloseWindow();
+    _ = rl.CodepointToUtf8(1, null);
+    _ = rl.ColorFromHSV(v3);
+    _ = rl.ColorFromNormalized(v4);
+    _ = rl.ColorNormalize(color);
+    _ = rl.ColorToHSV(color);
+    _ = rl.ColorToInt(color);
+    _ = rl.CompressData(null, 1, null);
+    _ = rl.CreatePhysicsBodyCircle(v2, 1.0, 1.0);
+    _ = rl.CreatePhysicsBodyPolygon(v2, 1.0, 1, 1.0);
+    _ = rl.CreatePhysicsBodyRectangle(v2, 1.0, 1.0, 1.0);
+    _ = rl.DecompressData(null, 1, null);
+    rl.DestroyPhysicsBody(body);
+    rl.DisableCursor();
+    _ = rl.DrawBillboard(cam3, txt, v3, 1.0, color);
+    _ = rl.DrawBillboardRec(cam3, txt, rect, v3, 1.0, color);
+    rl.DrawBoundingBox(bb, color);
     rl.DrawCircle(1, 1, 1.0, color);
+    _ = rl.DrawCircle3D(v3, 1.0, v3, 1.0, color);
     rl.DrawCircleGradient(1, 1, 1.0, color, color);
     rl.DrawCircleLines(1, 1, 1.0, color);
+    _ = rl.DrawCircleSectorLines(v2, 1.0, 1, 1, 1, color);
+    _ = rl.DrawCircleSector(v2, 1.0, 1, 1, 1, color);
+    _ = rl.DrawCircleV(v2, 1.0, color);
+    rl.DrawCircleV(v2, 1.0, color);
+    _ = rl.DrawCubeTexture(txt, v3, 1.0, 1.0, 1.0, color);
+    _ = rl.DrawCube(v3, 1.0, 1.0, 1.0, color);
+    _ = rl.DrawCubeV(v3, v3, color);
+    _ = rl.DrawCubeWires(v3, 1.0, 1.0, 1.0, color);
+    _ = rl.DrawCubeWiresV(v3, v3, color);
+    _ = rl.DrawCylinder(v3, 1.0, 1.0, 1.0, 1, color);
+    _ = rl.DrawCylinderWires(v3, 1.0, 1.0, 1.0, 1, color);
     rl.DrawEllipse(1, 1, 1.0, 1.0, color);
     rl.DrawEllipseLines(1, 1, 1.0, 1.0, color);
+    rl.DrawFPS(1, 1);
+    _ = rl.DrawGizmo(v3);
+    rl.DrawGrid(1, 1.0);
+    rl.DrawLine(1, 1, 1, 1, color);
+    _ = rl.DrawLine3D(v3, v3, color);
+    _ = rl.DrawLineBezier(v2, v2, 1.0, color);
+    _ = rl.DrawLineEx(v2, v2, 1.0, color);
+    rl.DrawLineStrip(null, 1, color);
+    rl.DrawLineStrip(&v2, 1, color);
+    _ = rl.DrawLineV(v2, v2, color);
+    _ = rl.DrawModelEx(model, v3, v3, 1.0, v3, color);
+    _ = rl.DrawModel(model, v3, 1.0, color);
+    _ = rl.DrawModelWiresEx(model, v3, v3, 1.0, v3, color);
+    _ = rl.DrawModelWires(model, v3, 1.0, color);
+    rl.DrawPixel(1, 1, color);
+    _ = rl.DrawPixelV(v2, color);
+    _ = rl.DrawPlane(v3, v2, color);
+    _ = rl.DrawPoint3D(v3, color);
+    _ = rl.DrawPolyLines(v2, 1, 1.0, 1.0, color);
+    _ = rl.DrawPoly(v2, 1, 1.0, 1.0, color);
+    rl.DrawRay(ray, color);
     rl.DrawRectangle(1, 1, 1, 1, color);
-    rl.DrawRectangleRec(rect, color);
-    rl.DrawRectangleGradientV(1, 1, 1, 1, color, color);
-    rl.DrawRectangleGradientH(1, 1, 1, 1, color, color);
     rl.DrawRectangleGradientEx(rect, color, color, color, color);
+    rl.DrawRectangleGradientH(1, 1, 1, 1, color, color);
+    rl.DrawRectangleGradientV(1, 1, 1, 1, color, color);
     rl.DrawRectangleLines(1, 1, 1, 1, color);
     rl.DrawRectangleLinesEx(rect, 1, color);
-    rl.DrawRectangleRounded(rect, 1.0, 1, color);
+    _ = rl.DrawRectanglePro(rect, v2, 1.0, color);
+    rl.DrawRectangleRec(rect, color);
     rl.DrawRectangleRoundedLines(rect, 1.0, 1, 1, color);
+    rl.DrawRectangleRounded(rect, 1.0, 1, color);
+    _ = rl.DrawRectangleV(v2, v2, color);
+    _ = rl.DrawRingLines(v2, 1.0, 1.0, 1, 1, 1, color);
+    _ = rl.DrawRing(v2, 1.0, 1.0, 1, 1, 1, color);
+    _ = rl.DrawSphereEx(v3, 1.0, 1, 1, color);
+    _ = rl.DrawSphere(v3, 1.0, color);
+    _ = rl.DrawSphereWires(v3, 1.0, 1, 1, color);
+    _ = rl.DrawTextCodepoint(font, 1, v2, 1.0, color);
+    _ = rl.DrawTextEx(font, string, v2, 1.0, 1.0, color);
+    rl.DrawTextRecEx(font, string, rect, 1.0, 1.0, false, color, 1, 1, color, color);
+    rl.DrawTextRec(font, string, rect, 1.0, 1.0, false, color);
+    rl.DrawText(string, 1, 1, 1, color);
+    _ = rl.DrawTextureEx(txt, v2, 1.0, 1.0, color);
+    _ = rl.DrawTextureNPatch(txt, npatch, rect, v2, 1.0, color);
+    _ = rl.DrawTexturePro(txt, rect, rect, v2, 1.0, color);
+    _ = rl.DrawTextureQuad(txt, v2, v2, rect, color);
+    _ = rl.DrawTextureRec(txt, rect, v2, color);
+    rl.DrawTexture(txt, 1, 1, color);
+    _ = rl.DrawTextureV(txt, v2, color);
+    rl.DrawTriangleFan(null, 1, color);
     rl.DrawTriangleFan(&v2, 1, color);
+    _ = rl.DrawTriangleLines(v2, v2, v2, color);
+    rl.DrawTriangleStrip(null, 1, color);
     rl.DrawTriangleStrip(&v2, 1, color);
-    rl.ExportImage(image, string);
+    _ = rl.DrawTriangle(v2, v2, v2, color);
+    rl.EnableCursor();
+    rl.EndBlendMode();
+    rl.EndDrawing();
+    rl.EndMode2D();
+    rl.EndMode3D();
+    rl.EndScissorMode();
+    rl.EndShaderMode();
+    rl.EndTextureMode();
+    rl.EndVrDrawing();
     rl.ExportImageAsCode(image, string);
+    rl.ExportImage(image, string);
+    rl.ExportMesh(mesh, string);
+    rl.ExportWaveAsCode(wave, string);
+    rl.ExportWave(wave, string);
+    _ = rl.Fade(color, 1.0);
+    _ = rl.GenImageCellular(1, 1, 1);
+    _ = rl.GenImageChecked(1, 1, 1, 1, color, color);
+    _ = rl.GenImageColor(1, 1, color);
+    _ = rl.GenImageFontAtlas(null, null, 1, 1, 1, 1);
+    _ = rl.GenImageGradientH(1, 1, color, color);
+    _ = rl.GenImageGradientRadial(1, 1, 1.0, color, color);
+    _ = rl.GenImageGradientV(1, 1, color, color);
+    _ = rl.GenImagePerlinNoise(1, 1, 1, 1, 1.0);
+    _ = rl.GenImageWhiteNoise(1, 1, 1.0);
+    _ = rl.GenMeshCube(1.0, 1.0, 1.0);
+    _ = rl.GenMeshCubicmap(image, v3);
+    _ = rl.GenMeshCylinder(1.0, 1.0, 1);
+    _ = rl.GenMeshHeightmap(image, v3);
+    _ = rl.GenMeshHemiSphere(1.0, 1, 1);
+    _ = rl.GenMeshKnot(1.0, 1.0, 1, 1);
+    _ = rl.GenMeshPlane(1.0, 1.0, 1, 1);
+    _ = rl.GenMeshPoly(1, 1.0);
+    _ = rl.GenMeshSphere(1.0, 1, 1);
+    _ = rl.GenMeshTorus(1.0, 1.0, 1, 1);
+    _ = rl.GenTextureBRDF(shader, 1);
+    _ = rl.GenTextureCubemap(shader, txt, 1);
+    _ = rl.GenTextureIrradiance(shader, txt, 1);
+    rl.GenTextureMipmaps(null);
+    _ = rl.GenTexturePrefilter(shader, txt, 1);
+    _ = rl.GetCameraMatrix2D(cam2);
+    _ = rl.GetCameraMatrix(cam3);
+    _ = rl.GetClipboardText();
+    _ = rl.GetCodepointsCount(string);
+    _ = rl.GetCodepoints(string, null);
+    _ = rl.GetCollisionRayGround(ray, 1.0);
+    _ = rl.GetCollisionRayModel(ray, model);
+    _ = rl.GetCollisionRayTriangle(ray, v3, v3, v3);
+    _ = rl.GetCollisionRec(rect, rect);
+    _ = rl.GetColor(1);
+    _ = rl.GetDirectoryFiles(string, null);
+    _ = rl.GetDirectoryPath(string);
+    _ = rl.GetDroppedFiles(null);
+    _ = rl.GetExtension(string);
+    _ = rl.GetFileModTime(string);
+    _ = rl.GetFileName(string);
+    _ = rl.GetFileNameWithoutExt(string);
+    _ = rl.GetFontDefault();
+    _ = rl.GetFPS();
+    _ = rl.GetFrameTime();
+    _ = rl.GetGamepadAxisCount(1);
+    _ = rl.GetGamepadAxisMovement(1, 1);
+    _ = rl.GetGamepadButtonPressed();
+    _ = rl.GetGamepadName(1);
+    _ = rl.GetGestureDetected();
+    _ = rl.GetGestureDragAngle();
+    _ = rl.GetGestureDragVector();
+    _ = rl.GetGestureHoldDuration();
+    _ = rl.GetGesturePinchAngle();
+    _ = rl.GetGesturePinchVector();
+    _ = rl.GetGlyphIndex(font, 1);
+    _ = rl.GetImageAlphaBorder(image, 1.0);
+    _ = rl.GetImageData(image);
+    _ = rl.GetImageDataNormalized(image);
+    _ = rl.GetKeyPressed();
+    _ = rl.GetMatrixModelview();
+    _ = rl.GetMatrixProjection();
+    _ = rl.GetMonitorCount();
+    _ = rl.GetMonitorHeight(1);
+    _ = rl.GetMonitorName(1);
+    _ = rl.GetMonitorPhysicalHeight(1);
+    _ = rl.GetMonitorPhysicalWidth(1);
+    _ = rl.GetMonitorWidth(1);
+    _ = rl.GetMousePosition();
+    _ = rl.GetMouseRay(v2, cam3);
+    _ = rl.GetMouseWheelMove();
+    _ = rl.GetMouseX();
+    _ = rl.GetMouseY();
+    _ = rl.GetMusicTimeLength(music);
+    _ = rl.GetMusicTimePlayed(music);
+    _ = rl.GetNextCodepoint(string, null);
+    _ = rl.GetPhysicsBodiesCount();
+    _ = rl.GetPhysicsBody(1);
+    _ = rl.GetPhysicsShapeType(1);
+    _ = rl.GetPhysicsShapeVertex(body, 1);
+    _ = rl.GetPhysicsShapeVerticesCount(1);
+    _ = rl.GetPixelDataSize(1, 1, 1);
+    _ = rl.GetPrevDirectoryPath(string);
+    _ = rl.GetRandomValue(1, 1);
+    _ = rl.GetScreenData();
+    _ = rl.GetScreenHeight();
+    _ = rl.GetScreenToWorld2D(v2, cam2);
+    _ = rl.GetScreenWidth();
+    _ = rl.GetShaderDefault();
+    _ = rl.GetShaderLocation(shader, string);
+    _ = rl.GetShapesTexture();
+    _ = rl.GetShapesTextureRec();
+    _ = rl.GetSoundsPlaying();
+    _ = rl.GetTextureData(txt);
+    _ = rl.GetTextureDefault();
+    _ = rl.GetTime();
+    _ = rl.GetTouchPointsCount();
+    _ = rl.GetTouchPosition(1);
+    _ = rl.GetTouchX();
+    _ = rl.GetTouchY();
+    _ = rl.GetWaveData(wave);
+    _ = rl.GetWindowHandle();
+    _ = rl.GetWindowPosition();
+    _ = rl.GetWorkingDirectory();
+    _ = rl.GetWorldToScreen2D(v2, cam2);
+    _ = rl.GetWorldToScreenEx(v3, cam3, 1, 1);
+    _ = rl.GetWorldToScreen(v3, cam3);
+    _ = rl.GuiColorPicker(rect, color);
+    _ = rl.GuiComboBox(rect, string, 1);
+    rl.GuiDisable();
+    rl.GuiDummyRec(rect, string);
+    rl.GuiEnable();
+    rl.GuiFade(1.0);
+    rl.GuiFont(font);
+    _ = rl.GuiGetStyle(1, 1);
+    _ = rl.GuiGrid(rect, 1.0, 1);
+    rl.GuiGroupBox(rect, string);
+    _ = rl.GuiIconText(1, string);
+    rl.GuiLabel(rect, string);
+    rl.GuiLine(rect, string);
+    rl.GuiLoadStyleDefault();
+    rl.GuiLoadStyleProps(null, 1);
+    rl.GuiLoadStyle(string);
+    rl.GuiLock();
+    _ = rl.GuiMessageBox(rect, string, string, string);
+    rl.GuiPanel(rect);
+    _ = rl.GuiProgressBar(rect, string, 1.0, 1.0, 1.0, false);
+    _ = rl.GuiScrollBar(rect, 1, 1, 1);
+    _ = rl.GuiScrollPanel(rect, rect, null);
+    rl.GuiSetStyle(1, 1, 1);
+    _ = rl.GuiSliderBar(rect, string, 1.0, 1.0, 1.0, false);
+    _ = rl.GuiSlider(rect, string, 1.0, 1.0, 1.0, false);
+    rl.GuiState(1);
+    rl.GuiStatusBar(rect, string);
+    _ = rl.GuiTextInputBox(rect, string, string, null, string);
+    _ = rl.GuiToggleGroup(rect, string, 1);
+    rl.GuiUnlock();
+    rl.GuiUpdateStyleComplete();
+    rl.HideCursor();
+    rl.HideWindow();
+    rl.ImageAlphaClear(null, color, 1.0);
+    rl.ImageAlphaCrop(null, 1.0);
+    rl.ImageAlphaMask(null, image);
+    rl.ImageAlphaPremultiply(null);
+    rl.ImageColorBrightness(null, 1);
+    rl.ImageColorContrast(null, 1.0);
+    rl.ImageColorGrayscale(null);
+    rl.ImageColorInvert(null);
+    rl.ImageColorReplace(null, color, color);
+    rl.ImageColorTint(null, color);
+    _ = rl.ImageCopy(image);
+    rl.ImageCrop(null, rect);
+    rl.ImageDither(null, 1, 1, 1, 1);
+    rl.ImageDraw(null, image, rect, rect, color);
+    rl.ImageDrawRectangleLines(null, rect, 1, color);
+    rl.ImageDrawRectangle(null, rect, color);
+    _ = rl.ImageDrawTextEx(null, v2, font, string, 1.0, 1.0, color);
+    _ = rl.ImageDrawText(null, v2, string, 1, color);
+    _ = rl.ImageExtractPalette(image, 1, null);
+    rl.ImageFlipHorizontal(null);
+    rl.ImageFlipVertical(null);
+    rl.ImageFormat(null, 1);
+    _ = rl.ImageFromImage(image, rect);
+    rl.ImageMipmaps(null);
+    rl.ImageResizeCanvas(null, 1, 1, 1, 1, color);
+    rl.ImageResizeNN(null, 1, 1);
+    rl.ImageResize(null, 1, 1);
+    rl.ImageRotateCCW(null);
+    rl.ImageRotateCW(null);
+    _ = rl.ImageTextEx(font, string, 1.0, 1.0, color);
+    _ = rl.ImageText(string, 1, color);
+    rl.ImageToPOT(null, color);
+    rl.InitAudioDevice();
+    _ = rl.InitAudioStream(1, 1, 1);
+    rl.InitPhysics();
+    rl.InitVrSimulator();
+    rl.InitWindow(100, 100, "test");
+    rl.InitWindow(1, 1, string);
+    _ = rl.IsAudioDeviceReady();
+    _ = rl.IsCursorHidden();
+    _ = rl.IsFileDropped();
+    _ = rl.IsPhysicsEnabled();
+    _ = rl.IsVrSimulatorReady();
+    _ = rl.IsWindowHidden();
+    _ = rl.IsWindowMinimized();
+    _ = rl.IsWindowReady();
+    _ = rl.IsWindowResized();
+    _ = rl.LoadFontData(string, 1, null, 1, 1);
+    _ = rl.LoadFontEx(string, 1, null, 1);
+    _ = rl.LoadFontFromImage(image, color, 1);
+    _ = rl.LoadFont(string);
+    _ = rl.LoadImageEx(null, 1, 1);
+    _ = rl.LoadImagePro(null, 1, 1, 1);
+    _ = rl.LoadImageRaw(string, 1, 1, 1, 1);
+    _ = rl.LoadImage(string);
+    _ = rl.LoadMaterialDefault();
+    _ = rl.LoadMaterials(string, null);
+    _ = rl.LoadMeshes(string, null);
+    _ = rl.LoadModelAnimations(string, null);
+    _ = rl.LoadModelFromMesh(mesh);
+    _ = rl.LoadModel(string);
+    _ = rl.LoadMusicStream(string);
+    _ = rl.LoadRenderTexture(1, 1);
+    _ = rl.LoadShaderCode(string, string);
+    _ = rl.LoadShader(string, string);
+    _ = rl.LoadSoundFromWave(wave);
+    _ = rl.LoadSound(string);
+    _ = rl.LoadText(string);
+    _ = rl.LoadTextureCubemap(image, 1);
+    _ = rl.LoadTextureFromImage(image);
+    _ = rl.LoadTexture(string);
+    _ = rl.LoadWave(string);
+    _ = rl.MeasureTextEx(font, string, 1.0, 1.0);
+    _ = rl.MeasureText(string, 1);
+    rl.MeshBinormals(null);
+    _ = rl.MeshBoundingBox(mesh);
+    rl.MeshTangents(null);
+    rl.OpenURL(string);
+    rl.PauseAudioStream(astream);
+    rl.PauseMusicStream(music);
+    rl.PauseSound(sound);
+    _ = rl.PhysicsAddForce(body, v2);
+    rl.PhysicsAddTorque(body, 1.0);
+    _ = rl.PhysicsShatter(body, v2, 1.0);
+    rl.PlayAudioStream(astream);
+    rl.PlayMusicStream(music);
+    rl.PlaySoundMulti(sound);
+    rl.PlaySound(sound);
+    rl.ResetPhysics();
+    rl.ResumeAudioStream(astream);
+    rl.ResumeMusicStream(music);
+    rl.ResumeSound(sound);
+    rl.RunPhysicsStep();
+    rl.SetAudioStreamBufferSizeDefault(1);
+    rl.SetAudioStreamPitch(astream, 1.0);
+    rl.SetAudioStreamVolume(astream, 1.0);
+    rl.SetCameraAltControl(1);
+    rl.SetCameraMode(cam3, 1);
+    rl.SetCameraMoveControls(1, 1, 1, 1, 1, 1);
+    rl.SetCameraPanControl(1);
+    rl.SetCameraSmoothZoomControl(1);
+    rl.SetClipboardText(string);
+    rl.SetConfigFlags(1);
+    rl.SetExitKey(1);
+    rl.SetGesturesEnabled(1);
+    rl.SetMasterVolume(1.0);
+    rl.SetMaterialTexture(null, 1, txt);
+    rl.SetMatrixModelview(matrix);
+    rl.SetMatrixProjection(matrix);
+    rl.SetModelMeshMaterial(null, 1, 1);
+    rl.SetMouseOffset(1, 1);
+    rl.SetMousePosition(1, 1);
+    rl.SetMouseScale(1.0, 1.0);
+    rl.SetMusicLoopCount(music, 1);
+    rl.SetMusicPitch(music, 1.0);
+    rl.SetMusicVolume(music, 1.0);
+    rl.SetPhysicsBodyRotation(body, 1.0);
+    rl.SetPhysicsGravity(1.0, 1.0);
+    rl.SetPhysicsTimeStep(1.0);
+    rl.SetShaderValueMatrix(shader, 1, matrix);
+    rl.SetShaderValue(shader, 1, null, 1);
+    rl.SetShaderValueTexture(shader, 1, txt);
+    rl.SetShaderValueV(shader, 1, null, 1, 1);
+    rl.SetShapesTexture(txt, rect);
+    rl.SetSoundPitch(sound, 1.0);
+    rl.SetSoundVolume(sound, 1.0);
+    rl.SetTargetFPS(1);
+    rl.SetTextureFilter(txt, 1);
+    rl.SetTextureWrap(txt, 1);
+    rl.SetTraceLogCallback(tlc);
+    rl.SetTraceLogExit(1);
+    rl.SetTraceLogLevel(1);
+    rl.SetVrConfiguration(vrdi, shader);
+    rl.SetWindowIcon(image);
+    rl.SetWindowMinSize(1, 1);
+    rl.SetWindowMonitor(1);
+    rl.SetWindowPosition(1, 1);
+    rl.SetWindowSize(1, 1);
+    rl.SetWindowTitle(string);
+    rl.ShowCursor();
+    rl.StopAudioStream(astream);
+    rl.StopMusicStream(music);
+    rl.StopSoundMulti();
+    rl.StopSound(sound);
+    _ = rl.StorageLoadValue(1);
+    rl.StorageSaveValue(1, 1);
+    rl.TakeScreenshot(string);
+    rl.TextAppend(null, string, null);
+    _ = rl.TextCopy(null, string);
+    _ = rl.TextFindIndex(string, string);
+    _ = rl.TextInsert(string, string, 1);
+    _ = rl.TextJoin(null, 1, string);
+    _ = rl.TextLength(string);
+    _ = rl.TextReplace(null, string, string);
+    _ = rl.TextSplit(string, 'c', null);
+    _ = rl.TextSubtext(string, 1, 1);
+    _ = rl.TextToInteger(string);
+    _ = rl.TextToLower(string);
+    _ = rl.TextToPascal(string);
+    _ = rl.TextToUpper(string);
+    _ = rl.TextToUtf8(null, 1);
+    rl.ToggleFullscreen();
+    rl.ToggleVrMode();
+    rl.UnhideWindow();
+    rl.UnloadFont(font);
     rl.UnloadImage(image);
-    rl.UnloadTexture(txt);
+    rl.UnloadMaterial(mat);
+    rl.UnloadMesh(mesh);
+    rl.UnloadModelAnimation(modelAnimation);
+    rl.UnloadModel(model);
+    rl.UnloadMusicStream(music);
     rl.UnloadRenderTexture(rtext);
-
-//     rl.UpdateTexture(txt, pixels: ?*const c_void)
-//     rl.ImageToPOT(image: [*c]Image, color)
-//     rl.ImageFormat(image: [*c]Image, 1)
-//     rl.ImageAlphaMask(image: [*c]Image, image)
-//     rl.ImageAlphaClear(image: [*c]Image, color, 1.0)
-//     rl.ImageAlphaCrop(image: [*c]Image, 1.0)
-//     rl.ImageAlphaPremultiply(image: [*c]Image)
-//     rl.ImageCrop(image: [*c]Image, rect)
-//     rl.ImageResize(image: [*c]Image, 1, 1)
-//     rl.ImageResizeNN(image: [*c]Image, 1, 1)
-//     rl.ImageResizeCanvas(image: [*c]Image, 1, 1, 1, 1, color)
-//     rl.ImageMipmaps(image: [*c]Image)
-//     rl.ImageDither(image: [*c]Image, 1, 1, 1, 1)
-//     rl.ImageDraw(dst: [*c]Image, image, rect, rect, color)
-//     rl.ImageDrawRectangle(dst: [*c]Image, rect, color)
-//     rl.ImageDrawRectangleLines(dst: [*c]Image, rect, 1, color)
-//     rl.ImageFlipVertical(image: [*c]Image)
-//     rl.ImageFlipHorizontal(image: [*c]Image)
-//     rl.ImageRotateCW(image: [*c]Image)
-//     rl.ImageRotateCCW(image: [*c]Image)
-//     rl.ImageColorTint(image: [*c]Image, color)
-//     rl.ImageColorInvert(image: [*c]Image)
-//     rl.ImageColorGrayscale(image: [*c]Image)
-//     rl.ImageColorContrast(image: [*c]Image, 1.0)
-//     rl.ImageColorBrightness(image: [*c]Image, 1)
-//     rl.ImageColorReplace(image: [*c]Image, color, color)
-//     rl.GenTextureMipmaps(texture: [*c]Texture2D)
-//     rl.SetTextureFilter(txt, 1)
-//     rl.SetTextureWrap(txt, 1)
-//     rl.DrawTexture(txt, 1, 1, color)
-//     rl.UnloadFont(font: Font)
-//     rl.DrawFPS(1, 1)
-//     rl.DrawText(string, 1, 1, 1, color)
-//     rl.DrawTextRec(font: Font, string, rect, 1.0, 1.0, wordWrap: bool, color)
-//     rl.DrawTextRecEx(font: Font, string, rect, 1.0, 1.0, wordWrap: bool, color, 1, 1, color, color)
-//     rl.TextAppend(text: [*c]u8, string, position: [*c]c_int)
-//     rl.DrawRay(ray: Ray, color)
-//     rl.DrawGrid(1, 1.0)
-//     rl.UnloadModel(model: Model)
-//     rl.ExportMesh(mesh: Mesh, string)
-//     rl.UnloadMesh(mesh: Mesh)
-//     rl.UnloadMaterial(material: Material)
-//     rl.SetMaterialTexture(material: [*c]Material, 1, txt)
-//     rl.SetModelMeshMaterial(model: [*c]Model, 1, 1)
-//     rl.UpdateModelAnimation(model: Model, anim: ModelAnimation, 1)
-//     rl.UnloadModelAnimation(anim: ModelAnimation)
-//     rl.MeshTangents(mesh: [*c]Mesh)
-//     rl.MeshBinormals(mesh: [*c]Mesh)
-//     rl.DrawBoundingBox(box: BoundingBox, color)
-//     rl.UnloadShader(shader: Shader)
-//     rl.SetShapesTexture(txt, rect)
-//     rl.SetShaderValue(shader: Shader, 1, value: ?*const c_void, 1)
-//     rl.SetShaderValueV(shader: Shader, 1, value: ?*const c_void, 1, 1)
-//     rl.SetShaderValueMatrix(shader: Shader, 1, mat: Matrix)
-//     rl.SetShaderValueTexture(shader: Shader, 1, txt)
-//     rl.SetMatrixProjection(proj: Matrix)
-//     rl.SetMatrixModelview(view: Matrix)
-//     rl.BeginShaderMode(shader: Shader)
-//     rl.BeginBlendMode(1)
-//     rl.UpdateVrTracking(camera: [*c]Camera)
-//     rl.SetVrConfiguration(info: VrDeviceInfo, distortion: Shader)
-//     rl.SetMasterVolume(1.0)
-//     rl.UpdateSound(sound: Sound, data: ?*const c_void, 1)
-//     rl.UnloadWave(wave: Wave)
-//     rl.UnloadSound(sound: Sound)
-//     rl.ExportWave(wave: Wave, string)
-//     rl.ExportWaveAsCode(wave: Wave, string)
-//     rl.PlaySound(sound: Sound)
-//     rl.StopSound(sound: Sound)
-//     rl.PauseSound(sound: Sound)
-//     rl.ResumeSound(sound: Sound)
-//     rl.PlaySoundMulti(sound: Sound)
-//     rl.SetSoundVolume(sound: Sound, 1.0)
-//     rl.SetSoundPitch(sound: Sound, 1.0)
-//     rl.WaveFormat(wave: [*c]Wave, 1, 1, 1)
-//     rl.WaveCrop(wave: [*c]Wave, 1, 1)
-//     rl.UnloadMusicStream(music: Music)
-//     rl.PlayMusicStream(music: Music)
-//     rl.UpdateMusicStream(music: Music)
-//     rl.StopMusicStream(music: Music)
-//     rl.PauseMusicStream(music: Music)
-//     rl.ResumeMusicStream(music: Music)
-//     rl.SetMusicVolume(music: Music, 1.0)
-//     rl.SetMusicPitch(music: Music, 1.0)
-//     rl.SetMusicLoopCount(music: Music, 1)
-//     rl.UpdateAudioStream(stream: AudioStream, data: ?*const c_void, 1)
-//     rl.CloseAudioStream(stream: AudioStream)
-//     rl.PlayAudioStream(stream: AudioStream)
-//     rl.PauseAudioStream(stream: AudioStream)
-//     rl.ResumeAudioStream(stream: AudioStream)
-//     rl.StopAudioStream(stream: AudioStream)
-//     rl.SetAudioStreamVolume(stream: AudioStream, 1.0)
-//     rl.SetAudioStreamPitch(stream: AudioStream, 1.0)
-//     rl.SetAudioStreamBufferSizeDefault(1)
-//     rl.GuiState(1)
-//     rl.GuiFont(font: Font)
-//     rl.GuiFade(1.0)
-//     rl.GuiSetStyle(1, 1, 1)
-//     rl.GuiGroupBox(rect, string)
-//     rl.GuiLine(rect, string)
-//     rl.GuiPanel(rect)
-//     rl.GuiLabel(rect, string)
-//     rl.GuiStatusBar(rect, string)
-//     rl.GuiDummyRec(rect, string)
-//     rl.GuiLoadStyle(string)
-//     rl.GuiLoadStyleProps(props: [*c]const c_int, 1)
-//     rl.SetPhysicsTimeStep(delta: f64)
-//     rl.SetPhysicsGravity(1.0, 1.0)
-//     rl.PhysicsAddTorque(body: PhysicsBody, 1.0)
-//     rl.SetPhysicsBodyRotation(body: PhysicsBody, 1.0)
-//     rl.DestroyPhysicsBody(body: PhysicsBody)
-//     rl.InitWindow(1, 1, string)
-//     rl.SetWindowIcon(image)
-//     rl.SetWindowTitle(string)
-//     rl.SetWindowPosition(1, 1)
-//     rl.SetWindowMonitor(1)
-//     rl.SetWindowMinSize(1, 1)
-//     rl.SetWindowSize(1, 1)
-//     rl.SetClipboardText(string)
-//     rl.ClearBackground(color)
-//     rl.BeginMode2D(cam2)
-//     rl.BeginMode3D(cam3)
-//     rl.BeginTextureMode(rtext)
-//     rl.BeginScissorMode(1, 1, 1, 1)
-//     rl.SetTargetFPS(1)
-//     rl.SetConfigFlags(1)
-//     rl.SetTraceLogLevel(1)
-//     rl.SetTraceLogExit(1)
-//     rl.SetTraceLogCallback(tlc)
-//     rl.TraceLog(1, string, ...)
-//     rl.TakeScreenshot(string)
-//     rl.StorageSaveValue(1, 1)
-//     rl.OpenURL(string)
-//     rl.SetExitKey(1)
-//     rl.SetMousePosition(1, 1)
-//     rl.SetMouseOffset(1, 1)
-//     rl.SetMouseScale(1.0, 1.0)
-//     rl.SetGesturesEnabled(1)
-//     rl.SetCameraMode(cam3, 1)
-//     rl.UpdateCamera(camera: [*c]Camera)
-//     rl.SetCameraPanControl(1)
-//     rl.SetCameraAltControl(1)
-//     rl.SetCameraSmoothZoomControl(1)
-//     rl.SetCameraMoveControls(1, 1, 1, 1, 1, 1)
-//     rl.DrawPixel(1, 1, color)
-//     rl.DrawLine(1, 1, 1, 1, color)
-//     rl.DrawLineStrip(points: [*c]Vector2, 1, color)
-//     rl.DrawCircle(1, 1, 1.0, color)
-//     rl.DrawCircleGradient(1, 1, 1.0, color, color)
-//     rl.DrawCircleLines(1, 1, 1.0, color)
-//     rl.DrawEllipse(1, 1, 1.0, 1.0, color)
-//     rl.DrawEllipseLines(1, 1, 1.0, 1.0, color)
-//     rl.DrawRectangle(1, 1, 1, 1, color)
-//     rl.DrawRectangleRec(rect, color)
-//     rl.DrawRectangleGradientV(1, 1, 1, 1, color, color)
-//     rl.DrawRectangleGradientH(1, 1, 1, 1, color, color)
-//     rl.DrawRectangleGradientEx(rect, color, color, color, color)
-//     rl.DrawRectangleLines(1, 1, 1, 1, color)
-//     rl.DrawRectangleLinesEx(rect, 1, color)
-//     rl.DrawRectangleRounded(rect, 1.0, 1, color)
-//     rl.DrawRectangleRoundedLines(rect, 1.0, 1, 1, color)
-//     rl.DrawTriangleFan(points: [*c]Vector2, 1, color)
-//     rl.DrawTriangleStrip(points: [*c]Vector2, 1, color)
-//     rl.ExportImage(image, string)
-//     rl.ExportImageAsCode(image, string)
-//     rl.UnloadImage(image)
-//     rl.UnloadTexture(txt)
-//     rl.UnloadRenderTexture(rtext)
-//     rl.UpdateTexture(txt, pixels: ?*const c_void)
-//     rl.ImageToPOT(image: [*c]Image, color)
-//     rl.ImageFormat(image: [*c]Image, 1)
-//     rl.ImageAlphaMask(image: [*c]Image, image)
-//     rl.ImageAlphaClear(image: [*c]Image, color, 1.0)
-//     rl.ImageAlphaCrop(image: [*c]Image, 1.0)
-//     rl.ImageAlphaPremultiply(image: [*c]Image)
-//     rl.ImageCrop(image: [*c]Image, rect)
-//     rl.ImageResize(image: [*c]Image, 1, 1)
-//     rl.ImageResizeNN(image: [*c]Image, 1, 1)
-//     rl.ImageResizeCanvas(image: [*c]Image, 1, 1, 1, 1, color)
-//     rl.ImageMipmaps(image: [*c]Image)
-//     rl.ImageDither(image: [*c]Image, 1, 1, 1, 1)
-//     rl.ImageDraw(dst: [*c]Image, image, rect, rect, color)
-//     rl.ImageDrawRectangle(dst: [*c]Image, rect, color)
-//     rl.ImageDrawRectangleLines(dst: [*c]Image, rect, 1, color)
-//     rl.ImageFlipVertical(image: [*c]Image)
-//     rl.ImageFlipHorizontal(image: [*c]Image)
-//     rl.ImageRotateCW(image: [*c]Image)
-//     rl.ImageRotateCCW(image: [*c]Image)
-//     rl.ImageColorTint(image: [*c]Image, color)
-//     rl.ImageColorInvert(image: [*c]Image)
-//     rl.ImageColorGrayscale(image: [*c]Image)
-//     rl.ImageColorContrast(image: [*c]Image, 1.0)
-//     rl.ImageColorBrightness(image: [*c]Image, 1)
-//     rl.ImageColorReplace(image: [*c]Image, color, color)
-//     rl.GenTextureMipmaps(texture: [*c]Texture2D)
-//     rl.SetTextureFilter(txt, 1)
-//     rl.SetTextureWrap(txt, 1)
-//     rl.DrawTexture(txt, 1, 1, color)
-//     rl.UnloadFont(font: Font)
-//     rl.DrawFPS(1, 1)
-//     rl.DrawText(string, 1, 1, 1, color)
-//     rl.DrawTextRec(font: Font, string, rect, 1.0, 1.0, wordWrap: bool, color)
-//     rl.DrawTextRecEx(font: Font, string, rect, 1.0, 1.0, wordWrap: bool, color, 1, 1, color, color)
-//     rl.TextAppend(text: [*c]u8, string, position: [*c]c_int)
-//     rl.DrawRay(ray: Ray, color)
-//     rl.DrawGrid(1, 1.0)
-//     rl.UnloadModel(model: Model)
-//     rl.ExportMesh(mesh: Mesh, string)
-//     rl.UnloadMesh(mesh: Mesh)
-//     rl.UnloadMaterial(material: Material)
-//     rl.SetMaterialTexture(material: [*c]Material, 1, txt)
-//     rl.SetModelMeshMaterial(model: [*c]Model, 1, 1)
-//     rl.UpdateModelAnimation(model: Model, anim: ModelAnimation, 1)
-//     rl.UnloadModelAnimation(anim: ModelAnimation)
-//     rl.MeshTangents(mesh: [*c]Mesh)
-//     rl.MeshBinormals(mesh: [*c]Mesh)
-//     rl.DrawBoundingBox(box: BoundingBox, color)
-//     rl.UnloadShader(shader: Shader)
-//     rl.SetShapesTexture(txt, rect)
-//     rl.SetShaderValue(shader: Shader, 1, value: ?*const c_void, 1)
-//     rl.SetShaderValueV(shader: Shader, 1, value: ?*const c_void, 1, 1)
-//     rl.SetShaderValueMatrix(shader: Shader, 1, mat: Matrix)
-//     rl.SetShaderValueTexture(shader: Shader, 1, txt)
-//     rl.SetMatrixProjection(proj: Matrix)
-//     rl.SetMatrixModelview(view: Matrix)
-//     rl.BeginShaderMode(shader: Shader)
-//     rl.BeginBlendMode(1)
-//     rl.UpdateVrTracking(camera: [*c]Camera)
-//     rl.SetVrConfiguration(info: VrDeviceInfo, distortion: Shader)
-//     rl.SetMasterVolume(1.0)
-//     rl.UpdateSound(sound: Sound, data: ?*const c_void, 1)
-//     rl.UnloadWave(wave: Wave)
-//     rl.UnloadSound(sound: Sound)
-//     rl.ExportWave(wave: Wave, string)
-//     rl.ExportWaveAsCode(wave: Wave, string)
-//     rl.PlaySound(sound: Sound)
-//     rl.StopSound(sound: Sound)
-//     rl.PauseSound(sound: Sound)
-//     rl.ResumeSound(sound: Sound)
-//     rl.PlaySoundMulti(sound: Sound)
-//     rl.SetSoundVolume(sound: Sound, 1.0)
-//     rl.SetSoundPitch(sound: Sound, 1.0)
-//     rl.WaveFormat(wave: [*c]Wave, 1, 1, 1)
-//     rl.WaveCrop(wave: [*c]Wave, 1, 1)
-//     rl.UnloadMusicStream(music: Music)
-//     rl.PlayMusicStream(music: Music)
-//     rl.UpdateMusicStream(music: Music)
-//     rl.StopMusicStream(music: Music)
-//     rl.PauseMusicStream(music: Music)
-//     rl.ResumeMusicStream(music: Music)
-//     rl.SetMusicVolume(music: Music, 1.0)
-//     rl.SetMusicPitch(music: Music, 1.0)
-//     rl.SetMusicLoopCount(music: Music, 1)
-//     rl.UpdateAudioStream(stream: AudioStream, data: ?*const c_void, 1)
-//     rl.CloseAudioStream(stream: AudioStream)
-//     rl.PlayAudioStream(stream: AudioStream)
-//     rl.PauseAudioStream(stream: AudioStream)
-//     rl.ResumeAudioStream(stream: AudioStream)
-//     rl.StopAudioStream(stream: AudioStream)
-//     rl.SetAudioStreamVolume(stream: AudioStream, 1.0)
-//     rl.SetAudioStreamPitch(stream: AudioStream, 1.0)
-//     rl.SetAudioStreamBufferSizeDefault(1)
-//     rl.GuiState(1)
-//     rl.GuiFont(font: Font)
-//     rl.GuiFade(1.0)
-//     rl.GuiSetStyle(1, 1, 1)
-//     rl.GuiGroupBox(rect, string)
-//     rl.GuiLine(rect, string)
-//     rl.GuiPanel(rect)
-//     rl.GuiLabel(rect, string)
-//     rl.GuiStatusBar(rect, string)
-//     rl.GuiDummyRec(rect, string)
-//     rl.GuiLoadStyle(string)
-//     rl.GuiLoadStyleProps(props: [*c]const c_int, 1)
-//     rl.SetPhysicsTimeStep(delta: f64)
-//     rl.SetPhysicsGravity(1.0, 1.0)
-//     rl.PhysicsAddTorque(body: PhysicsBody, 1.0)
-//     rl.SetPhysicsBodyRotation(body: PhysicsBody, 1.0)
-//     rl.DestroyPhysicsBody(body: PhysicsBody)
-
-
-//     rl.GetWindowHandle() ?*c_void;
-//     rl.GetMonitorName(1) [*c]const u8;
-//     rl.GetClipboardText() [*c]const u8;
-//     rl.GetMouseRay(mousePosition: * const Vector2, cam3)  Ray;
-//     rl.GetWorldToScreen(position: * const Vector3, cam3)  Vector2;
-//     rl.GetWorldToScreenEx(position: * const Vector3, cam3, 1, 1)  Vector2;
-//     rl.GetWorldToScreen2D(position: * const Vector2, cam2)  Vector2;
-//     rl.GetScreenToWorld2D(position: * const Vector2, cam2)  Vector2;
-//     rl.ColorFromNormalized(normalized: * const Vector4)  Color;
-//     rl.ColorFromHSV(hsv: * const Vector3)  Color;
-//     rl.GetExtension(string) [*c]const u8;
-//     rl.GetFileName(string) [*c]const u8;
-//     rl.GetFileNameWithoutExt(string) [*c]const u8;
-//     rl.GetDirectoryPath(string) [*c]const u8;
-//     rl.GetPrevDirectoryPath(string) [*c]const u8;
-//     rl.GetWorkingDirectory() [*c]const u8;
-//     rl.GetDirectoryFiles(string, count: [*c]c_int) [*c][*c]u8;
-//     rl.GetDroppedFiles(count: [*c]c_int) [*c][*c]u8;
-//     rl.CompressData(data: [*c]u8, 1, compDataLength: [*c]c_int) [*c]u8;
-//     rl.DecompressData(compData: [*c]u8, 1, dataLength: [*c]c_int) [*c]u8;
-//     rl.GetGamepadName(1) [*c]const u8;
-//     rl.DrawPixelV(position: * const Vector2, color)  void;
-//     rl.DrawLineV(startPos: * const Vector2, endPos: * const Vector2, color)  void;
-//     rl.DrawLineEx(startPos: * const Vector2, endPos: * const Vector2, 1.0, color)  void;
-//     rl.DrawLineBezier(startPos: * const Vector2, endPos: * const Vector2, 1.0, color)  void;
-//     rl.DrawCircleSector(center: * const Vector2, 1.0, 1, 1, 1, color)  void;
-//     rl.DrawCircleSectorLines(center: * const Vector2, 1.0, 1, 1, 1, color)  void;
-//     rl.DrawCircleV(center: * const Vector2, 1.0, color)  void;
-//     rl.DrawRing(center: * const Vector2, 1.0, 1.0, 1, 1, 1, color)  void;
-//     rl.DrawRingLines(center: * const Vector2, 1.0, 1.0, 1, 1, 1, color)  void;
-//     rl.DrawRectangleV(position: * const Vector2, size: * const Vector2, color)  void;
-//     rl.DrawRectanglePro(rect, origin: * const Vector2, 1.0, color)  void;
-//     rl.DrawTriangle(v1: * const Vector2, v2: * const Vector2, v3: * const Vector2, color)  void;
-//     rl.DrawTriangleLines(v1: * const Vector2, v2: * const Vector2, v3: * const Vector2, color)  void;
-//     rl.DrawPoly(center: * const Vector2, 1, 1.0, 1.0, color)  void;
-//     rl.DrawPolyLines(center: * const Vector2, 1, 1.0, 1.0, color)  void;
-//     rl.CheckCollisionCircles(center1: * const Vector2, radius1: f32, center2: * const Vector2, radius2: f32)  bool;
-//     rl.CheckCollisionCircleRec(center: * const Vector2, 1.0, rect)  bool;
-//     rl.CheckCollisionPointRec(point: * const Vector2, rect)  bool;
-//     rl.CheckCollisionPointCircle(point: * const Vector2, center: * const Vector2, 1.0)  bool;
-//     rl.CheckCollisionPointTriangle(point: * const Vector2, p1: * const Vector2, p2: * const Vector2, p3: * const Vector2)  bool;
-//     rl.GetImageData(image) [*c]Color;
-//     rl.GetImageDataNormalized(image) [*c]Vector4;
-//     rl.ImageExtractPalette(image, 1, extractCount: [*c]c_int) [*c]Color;
-//     rl.ImageDrawText(dst: [*c]Image, position: * const Vector2, string, 1, color)  void;
-//     rl.ImageDrawTextEx(dst: [*c]Image, position: * const Vector2, font: Font, string, 1.0, 1.0, color)  void;
-//     rl.DrawTextureV(txt, position: * const Vector2, color)  void;
-//     rl.DrawTextureEx(txt, position: * const Vector2, 1.0, 1.0, color)  void;
-//     rl.DrawTextureRec(txt, rect, position: * const Vector2, color)  void;
-//     rl.DrawTextureQuad(txt, tiling: * const Vector2, offset: * const Vector2, rect, color)  void;
-//     rl.DrawTexturePro(txt, rect, rect, origin: * const Vector2, 1.0, color)  void;
-//     rl.DrawTextureNPatch(txt, nPatchInfo: NPatchInfo, rect, origin: * const Vector2, 1.0, color)  void;
-//     rl.LoadFontData(string, 1, fontChars: [*c]c_int, 1, 1) [*c]CharInfo;
-//     rl.DrawTextEx(font: Font, string, position: * const Vector2, 1.0, 1.0, color)  void;
-//     rl.DrawTextCodepoint(font: Font, 1, position: * const Vector2, 1.0, color)  void;
-//     rl.TextFormat(string, ...) [*c]const u8;
-//     rl.TextSubtext(string, 1, 1) [*c]const u8;
-//     rl.TextReplace(text: [*c]u8, string, string) [*c]u8;
-//     rl.TextInsert(string, string, 1) [*c]u8;
-//     rl.TextJoin(textList: [*c][*c]const u8, 1, string) [*c]const u8;
-//     rl.TextSplit(string, delimiter: u8, count: [*c]c_int) [*c][*c]const u8;
-//     rl.TextToUpper(string) [*c]const u8;
-//     rl.TextToLower(string) [*c]const u8;
-//     rl.TextToPascal(string) [*c]const u8;
-//     rl.TextToUtf8(codepoints: [*c]c_int, 1) [*c]u8;
-//     rl.GetCodepoints(string, count: [*c]c_int) [*c]c_int;
-//     rl.CodepointToUtf8(1, byteLength: [*c]c_int) [*c]const u8;
-//     rl.DrawLine3D(startPos: * const Vector3, endPos: * const Vector3, color)  void;
-//     rl.DrawPoint3D(position: * const Vector3, color)  void;
-//     rl.DrawCircle3D(center: * const Vector3, 1.0, rotationAxis: * const Vector3, 1.0, color)  void;
-//     rl.DrawCube(position: * const Vector3, 1.0, 1.0, 1.0, color)  void;
-//     rl.DrawCubeV(position: * const Vector3, size: * const Vector3, color)  void;
-//     rl.DrawCubeWires(position: * const Vector3, 1.0, 1.0, 1.0, color)  void;
-//     rl.DrawCubeWiresV(position: * const Vector3, size: * const Vector3, color)  void;
-//     rl.DrawCubeTexture(txt, position: * const Vector3, 1.0, 1.0, 1.0, color)  void;
-//     rl.DrawSphere(centerPos: * const Vector3, 1.0, color)  void;
-//     rl.DrawSphereEx(centerPos: * const Vector3, 1.0, 1, 1, color)  void;
-//     rl.DrawSphereWires(centerPos: * const Vector3, 1.0, 1, 1, color)  void;
-//     rl.DrawCylinder(position: * const Vector3, 1.0, 1.0, 1.0, 1, color)  void;
-//     rl.DrawCylinderWires(position: * const Vector3, 1.0, 1.0, 1.0, 1, color)  void;
-//     rl.DrawPlane(centerPos: * const Vector3, size: * const Vector2, color)  void;
-//     rl.DrawGizmo(position: * const Vector3)  void;
-//     rl.LoadMeshes(string, meshCount: [*c]c_int) [*c]Mesh;
-//     rl.LoadMaterials(string, materialCount: [*c]c_int) [*c]Material;
-//     rl.LoadModelAnimations(string, animsCount: [*c]c_int) [*c]ModelAnimation;
-//     rl.GenMeshHeightmap(image, size: * const Vector3)  Mesh;
-//     rl.GenMeshCubicmap(image, cubeSize: * const Vector3)  Mesh;
-//     rl.DrawModel(model: Model, position: * const Vector3, 1.0, color)  void;
-//     rl.DrawModelEx(model: Model, position: * const Vector3, rotationAxis: * const Vector3, 1.0, scale: * const Vector3, color)  void;
-//     rl.DrawModelWires(model: Model, position: * const Vector3, 1.0, color)  void;
-//     rl.DrawModelWiresEx(model: Model, position: * const Vector3, rotationAxis: * const Vector3, 1.0, scale: * const Vector3, color)  void;
-//     rl.DrawBillboard(cam3, txt, center: * const Vector3, 1.0, color)  void;
-//     rl.DrawBillboardRec(cam3, txt, rect, center: * const Vector3, 1.0, color)  void;
-//     rl.CheckCollisionSpheres(centerA: * const Vector3, 1.0, centerB: * const Vector3, 1.0)  bool;
-//     rl.CheckCollisionBoxSphere(box: BoundingBox, center: * const Vector3, 1.0)  bool;
-//     rl.CheckCollisionRaySphere(ray: Ray, center: * const Vector3, 1.0)  bool;
-//     rl.CheckCollisionRaySphereEx(ray: Ray, center: * const Vector3, 1.0, collisionPoint: [*c]Vector3)  bool;
-//     rl.GetCollisionRayTriangle(ray: Ray, p1: * const Vector3, p2: * const Vector3, p3: * const Vector3)  RayHitInfo;
-//     rl.LoadText(string) [*c]u8;
-//     rl.GetWaveData(wave: Wave) [*c]f32;
-//     rl.GuiIconText(1, string) [*c]const u8;
-//     rl.CreatePhysicsBodyCircle(pos: * const Vector2, 1.0, 1.0)  PhysicsBody;
-//     rl.CreatePhysicsBodyRectangle(pos: * const Vector2, 1.0, 1.0, 1.0)  PhysicsBody;
-//     rl.CreatePhysicsBodyPolygon(pos: * const Vector2, 1.0, 1, 1.0)  PhysicsBody;
-//     rl.PhysicsAddForce(body: PhysicsBody, force: * const Vector2)  void;
-//     rl.PhysicsShatter(body: PhysicsBody, position: * const Vector2, 1.0)  void;
-//     rl.GetWindowHandle() ?*c_void;
-//     rl.GetMonitorName(1) [*c]const u8;
-//     rl.GetClipboardText() [*c]const u8;
-//     rl.GetMouseRay(mousePosition: * const Vector2, cam3)  Ray;
-//     rl.GetWorldToScreen(position: * const Vector3, cam3)  Vector2;
-//     rl.GetWorldToScreenEx(position: * const Vector3, cam3, 1, 1)  Vector2;
-//     rl.GetWorldToScreen2D(position: * const Vector2, cam2)  Vector2;
-//     rl.GetScreenToWorld2D(position: * const Vector2, cam2)  Vector2;
-//     rl.ColorFromNormalized(normalized: * const Vector4)  Color;
-//     rl.ColorFromHSV(hsv: * const Vector3)  Color;
-//     rl.GetExtension(string) [*c]const u8;
-//     rl.GetFileName(string) [*c]const u8;
-//     rl.GetFileNameWithoutExt(string) [*c]const u8;
-//     rl.GetDirectoryPath(string) [*c]const u8;
-//     rl.GetPrevDirectoryPath(string) [*c]const u8;
-//     rl.GetWorkingDirectory() [*c]const u8;
-//     rl.GetDirectoryFiles(string, count: [*c]c_int) [*c][*c]u8;
-//     rl.GetDroppedFiles(count: [*c]c_int) [*c][*c]u8;
-//     rl.CompressData(data: [*c]u8, 1, compDataLength: [*c]c_int) [*c]u8;
-//     rl.DecompressData(compData: [*c]u8, 1, dataLength: [*c]c_int) [*c]u8;
-//     rl.GetGamepadName(1) [*c]const u8;
-//     rl.DrawPixelV(position: * const Vector2, color)  void;
-//     rl.DrawLineV(startPos: * const Vector2, endPos: * const Vector2, color)  void;
-//     rl.DrawLineEx(startPos: * const Vector2, endPos: * const Vector2, 1.0, color)  void;
-//     rl.DrawLineBezier(startPos: * const Vector2, endPos: * const Vector2, 1.0, color)  void;
-//     rl.DrawCircleSector(center: * const Vector2, 1.0, 1, 1, 1, color)  void;
-//     rl.DrawCircleSectorLines(center: * const Vector2, 1.0, 1, 1, 1, color)  void;
-//     rl.DrawRing(center: * const Vector2, 1.0, 1.0, 1, 1, 1, color)  void;
-//     rl.DrawRingLines(center: * const Vector2, 1.0, 1.0, 1, 1, 1, color)  void;
-//     rl.DrawRectangleV(position: * const Vector2, size: * const Vector2, color)  void;
-//     rl.DrawRectanglePro(rect, origin: * const Vector2, 1.0, color)  void;
-//     rl.DrawTriangle(v1: * const Vector2, v2: * const Vector2, v3: * const Vector2, color)  void;
-//     rl.DrawTriangleLines(v1: * const Vector2, v2: * const Vector2, v3: * const Vector2, color)  void;
-//     rl.DrawPoly(center: * const Vector2, 1, 1.0, 1.0, color)  void;
-//     rl.DrawPolyLines(center: * const Vector2, 1, 1.0, 1.0, color)  void;
-//     rl.CheckCollisionCircles(center1: * const Vector2, radius1: f32, center2: * const Vector2, radius2: f32)  bool;
-//     rl.CheckCollisionCircleRec(center: * const Vector2, 1.0, rect)  bool;
-//     rl.CheckCollisionPointRec(point: * const Vector2, rect)  bool;
-//     rl.CheckCollisionPointCircle(point: * const Vector2, center: * const Vector2, 1.0)  bool;
-//     rl.CheckCollisionPointTriangle(point: * const Vector2, p1: * const Vector2, p2: * const Vector2, p3: * const Vector2)  bool;
-//     rl.GetImageData(image) [*c]Color;
-//     rl.GetImageDataNormalized(image) [*c]Vector4;
-//     rl.ImageExtractPalette(image, 1, extractCount: [*c]c_int) [*c]Color;
-//     rl.ImageDrawText(dst: [*c]Image, position: * const Vector2, string, 1, color)  void;
-//     rl.ImageDrawTextEx(dst: [*c]Image, position: * const Vector2, font: Font, string, 1.0, 1.0, color)  void;
-//     rl.DrawTextureV(txt, position: * const Vector2, color)  void;
-//     rl.DrawTextureEx(txt, position: * const Vector2, 1.0, 1.0, color)  void;
-//     rl.DrawTextureRec(txt, rect, position: * const Vector2, color)  void;
-//     rl.DrawTextureQuad(txt, tiling: * const Vector2, offset: * const Vector2, rect, color)  void;
-//     rl.DrawTexturePro(txt, rect, rect, origin: * const Vector2, 1.0, color)  void;
-//     rl.DrawTextureNPatch(txt, nPatchInfo: NPatchInfo, rect, origin: * const Vector2, 1.0, color)  void;
-//     rl.LoadFontData(string, 1, fontChars: [*c]c_int, 1, 1) [*c]CharInfo;
-//     rl.DrawTextEx(font: Font, string, position: * const Vector2, 1.0, 1.0, color)  void;
-//     rl.DrawTextCodepoint(font: Font, 1, position: * const Vector2, 1.0, color)  void;
-//     rl.TextFormat(string, ...) [*c]const u8;
-//     rl.TextSubtext(string, 1, 1) [*c]const u8;
-//     rl.TextReplace(text: [*c]u8, string, string) [*c]u8;
-//     rl.TextInsert(string, string, 1) [*c]u8;
-//     rl.TextJoin(textList: [*c][*c]const u8, 1, string) [*c]const u8;
-//     rl.TextSplit(string, delimiter: u8, count: [*c]c_int) [*c][*c]const u8;
-//     rl.TextToUpper(string) [*c]const u8;
-//     rl.TextToLower(string) [*c]const u8;
-//     rl.TextToPascal(string) [*c]const u8;
-//     rl.TextToUtf8(codepoints: [*c]c_int, 1) [*c]u8;
-//     rl.GetCodepoints(string, count: [*c]c_int) [*c]c_int;
-//     rl.CodepointToUtf8(1, byteLength: [*c]c_int) [*c]const u8;
-//     rl.DrawLine3D(startPos: * const Vector3, endPos: * const Vector3, color)  void;
-//     rl.DrawPoint3D(position: * const Vector3, color)  void;
-//     rl.DrawCircle3D(center: * const Vector3, 1.0, rotationAxis: * const Vector3, 1.0, color)  void;
-//     rl.DrawCube(position: * const Vector3, 1.0, 1.0, 1.0, color)  void;
-//     rl.DrawCubeV(position: * const Vector3, size: * const Vector3, color)  void;
-//     rl.DrawCubeWires(position: * const Vector3, 1.0, 1.0, 1.0, color)  void;
-//     rl.DrawCubeWiresV(position: * const Vector3, size: * const Vector3, color)  void;
-//     rl.DrawCubeTexture(txt, position: * const Vector3, 1.0, 1.0, 1.0, color)  void;
-//     rl.DrawSphere(centerPos: * const Vector3, 1.0, color)  void;
-//     rl.DrawSphereEx(centerPos: * const Vector3, 1.0, 1, 1, color)  void;
-//     rl.DrawSphereWires(centerPos: * const Vector3, 1.0, 1, 1, color)  void;
-//     rl.DrawCylinder(position: * const Vector3, 1.0, 1.0, 1.0, 1, color)  void;
-//     rl.DrawCylinderWires(position: * const Vector3, 1.0, 1.0, 1.0, 1, color)  void;
-//     rl.DrawPlane(centerPos: * const Vector3, size: * const Vector2, color)  void;
-//     rl.DrawGizmo(position: * const Vector3)  void;
-//     rl.LoadMeshes(string, meshCount: [*c]c_int) [*c]Mesh;
-//     rl.LoadMaterials(string, materialCount: [*c]c_int) [*c]Material;
-//     rl.LoadModelAnimations(string, animsCount: [*c]c_int) [*c]ModelAnimation;
-//     rl.GenMeshHeightmap(image, size: * const Vector3)  Mesh;
-//     rl.GenMeshCubicmap(image, cubeSize: * const Vector3)  Mesh;
-//     rl.DrawModel(model: Model, position: * const Vector3, 1.0, color)  void;
-//     rl.DrawModelEx(model: Model, position: * const Vector3, rotationAxis: * const Vector3, 1.0, scale: * const Vector3, color)  void;
-//     rl.DrawModelWires(model: Model, position: * const Vector3, 1.0, color)  void;
-//     rl.DrawModelWiresEx(model: Model, position: * const Vector3, rotationAxis: * const Vector3, 1.0, scale: * const Vector3, color)  void;
-//     rl.DrawBillboard(cam3, txt, center: * const Vector3, 1.0, color)  void;
-//     rl.DrawBillboardRec(cam3, txt, rect, center: * const Vector3, 1.0, color)  void;
-//     rl.CheckCollisionSpheres(centerA: * const Vector3, 1.0, centerB: * const Vector3, 1.0)  bool;
-//     rl.CheckCollisionBoxSphere(box: BoundingBox, center: * const Vector3, 1.0)  bool;
-//     rl.CheckCollisionRaySphere(ray: Ray, center: * const Vector3, 1.0)  bool;
-//     rl.CheckCollisionRaySphereEx(ray: Ray, center: * const Vector3, 1.0, collisionPoint: [*c]Vector3)  bool;
-//     rl.GetCollisionRayTriangle(ray: Ray, p1: * const Vector3, p2: * const Vector3, p3: * const Vector3)  RayHitInfo;
-//     rl.LoadText(string) [*c]u8;
-//     rl.GetWaveData(wave: Wave) [*c]f32;
-//     rl.GuiIconText(1, string) [*c]const u8;
-//     rl.CreatePhysicsBodyCircle(pos: * const Vector2, 1.0, 1.0)  PhysicsBody;
-//     rl.CreatePhysicsBodyRectangle(pos: * const Vector2, 1.0, 1.0, 1.0)  PhysicsBody;
-//     rl.CreatePhysicsBodyPolygon(pos: * const Vector2, 1.0, 1, 1.0)  PhysicsBody;
-//     rl.PhysicsAddForce(body: PhysicsBody, force: * const Vector2)  void;
-//     rl.PhysicsShatter(body: PhysicsBody, position: * const Vector2, 1.0)  void;
-//     rl.GetScreenWidth() c_int;
-//     rl.GetScreenHeight() c_int;
-//     rl.GetMonitorCount() c_int;
-//     rl.GetMonitorWidth(1) c_int;
-//     rl.GetMonitorHeight(1) c_int;
-//     rl.GetMonitorPhysicalWidth(1) c_int;
-//     rl.GetMonitorPhysicalHeight(1) c_int;
-//     rl.GetWindowPosition() Vector2;
-//     rl.GetCameraMatrix(cam3) Matrix;
-//     rl.GetCameraMatrix2D(cam2) Matrix;
-//     rl.GetFPS() c_int;
-//     rl.GetFrameTime() f32;
-//     rl.GetTime() f64;
-//     rl.ColorToInt(color) c_int;
-//     rl.ColorNormalize(color) Vector4;
-//     rl.ColorToHSV(color) Vector3;
-//     rl.GetColor(1) Color;
-//     rl.Fade(color, 1.0) Color;
-//     rl.GetRandomValue(1, 1) c_int;
-//     rl.GetFileModTime(string) c_long;
-//     rl.StorageLoadValue(1) c_int;
-//     rl.GetKeyPressed() c_int;
-//     rl.GetGamepadButtonPressed() c_int;
-//     rl.GetGamepadAxisCount(1) c_int;
-//     rl.GetGamepadAxisMovement(1, 1) f32;
-//     rl.GetMouseX() c_int;
-//     rl.GetMouseY() c_int;
-//     rl.GetMousePosition() Vector2;
-//     rl.GetMouseWheelMove() c_int;
-//     rl.GetTouchX() c_int;
-//     rl.GetTouchY() c_int;
-//     rl.GetTouchPosition(1) Vector2;
-//     rl.GetGestureDetected() c_int;
-//     rl.GetTouchPointsCount() c_int;
-//     rl.GetGestureHoldDuration() f32;
-//     rl.GetGestureDragVector() Vector2;
-//     rl.GetGestureDragAngle() f32;
-//     rl.GetGesturePinchVector() Vector2;
-//     rl.GetGesturePinchAngle() f32;
-//     rl.GetCollisionRec(rect, rect) Rectangle;
-//     rl.LoadImage(string) Image;
-//     rl.LoadImageEx(pixels: [*c]Color, 1, 1) Image;
-//     rl.LoadImagePro(data: ?*c_void, 1, 1, 1) Image;
-//     rl.LoadImageRaw(string, 1, 1, 1, 1) Image;
-//     rl.LoadTexture(string) Texture2D;
-//     rl.LoadTextureFromImage(image) Texture2D;
-//     rl.LoadTextureCubemap(image, 1) TextureCubemap;
-//     rl.LoadRenderTexture(1, 1) RenderTexture2D;
-//     rl.GetImageAlphaBorder(image, 1.0) Rectangle;
-//     rl.GetPixelDataSize(1, 1, 1) c_int;
-//     rl.GetTextureData(txt) Image;
-//     rl.GetScreenData() Image;
-//     rl.ImageCopy(image) Image;
-//     rl.ImageFromImage(image, rect) Image;
-//     rl.ImageText(string, 1, color) Image;
-//     rl.ImageTextEx(font: Font, string, 1.0, 1.0, color) Image;
-//     rl.GenImageColor(1, 1, color) Image;
-//     rl.GenImageGradientV(1, 1, color, color) Image;
-//     rl.GenImageGradientH(1, 1, color, color) Image;
-//     rl.GenImageGradientRadial(1, 1, 1.0, color, color) Image;
-//     rl.GenImageChecked(1, 1, 1, 1, color, color) Image;
-//     rl.GenImageWhiteNoise(1, 1, 1.0) Image;
-//     rl.GenImagePerlinNoise(1, 1, 1, 1, 1.0) Image;
-//     rl.GenImageCellular(1, 1, 1) Image;
-//     rl.GetFontDefault() Font;
-//     rl.LoadFont(string) Font;
-//     rl.LoadFontEx(string, 1, fontChars: [*c]c_int, 1) Font;
-//     rl.LoadFontFromImage(image, color, 1) Font;
-//     rl.GenImageFontAtlas(chars: [*c]const CharInfo, recs: [*c][*c]Rectangle, 1, 1, 1, 1) Image;
-//     rl.MeasureText(string, 1) c_int;
-//     rl.MeasureTextEx(font: Font, string, 1.0, 1.0) Vector2;
-//     rl.GetGlyphIndex(font: Font, 1) c_int;
-//     rl.TextCopy(dst: [*c]u8, string) c_int;
-//     rl.TextLength(string) c_uint;
-//     rl.TextFindIndex(string, string) c_int;
-//     rl.TextToInteger(string) c_int;
-//     rl.GetCodepointsCount(string) c_int;
-//     rl.GetNextCodepoint(string, bytesProcessed: [*c]c_int) c_int;
-//     rl.LoadModel(string) Model;
-//     rl.LoadModelFromMesh(mesh: Mesh) Model;
-//     rl.LoadMaterialDefault() Material;
-//     rl.GenMeshPoly(1, 1.0) Mesh;
-//     rl.GenMeshPlane(1.0, 1.0, 1, 1) Mesh;
-//     rl.GenMeshCube(1.0, 1.0, 1.0) Mesh;
-//     rl.GenMeshSphere(1.0, 1, 1) Mesh;
-//     rl.GenMeshHemiSphere(1.0, 1, 1) Mesh;
-//     rl.GenMeshCylinder(1.0, 1.0, 1) Mesh;
-//     rl.GenMeshTorus(1.0, 1.0, 1, 1) Mesh;
-//     rl.GenMeshKnot(1.0, 1.0, 1, 1) Mesh;
-//     rl.MeshBoundingBox(mesh: Mesh) BoundingBox;
-//     rl.GetCollisionRayModel(ray: Ray, model: Model) RayHitInfo;
-//     rl.GetCollisionRayGround(ray: Ray, 1.0) RayHitInfo;
-//     rl.LoadShader(string, string) Shader;
-//     rl.LoadShaderCode(string, string) Shader;
-//     rl.GetShaderDefault() Shader;
-//     rl.GetTextureDefault() Texture2D;
-//     rl.GetShapesTexture() Texture2D;
-//     rl.GetShapesTextureRec() Rectangle;
-//     rl.GetShaderLocation(shader: Shader, string) c_int;
-//     rl.GetMatrixModelview() Matrix;
-//     rl.GetMatrixProjection() Matrix;
-//     rl.GenTextureCubemap(shader: Shader, txt, 1) Texture2D;
-//     rl.GenTextureIrradiance(shader: Shader, txt, 1) Texture2D;
-//     rl.GenTexturePrefilter(shader: Shader, txt, 1) Texture2D;
-//     rl.GenTextureBRDF(shader: Shader, 1) Texture2D;
-//     rl.LoadWave(string) Wave;
-//     rl.LoadSound(string) Sound;
-//     rl.LoadSoundFromWave(wave: Wave) Sound;
-//     rl.GetSoundsPlaying() c_int;
-//     rl.WaveCopy(wave: Wave) Wave;
-//     rl.LoadMusicStream(string) Music;
-//     rl.GetMusicTimeLength(music: Music) f32;
-//     rl.GetMusicTimePlayed(music: Music) f32;
-//     rl.InitAudioStream(1, 1, 1) AudioStream;
-//     rl.GuiGetStyle(1, 1) c_int;
-//     rl.GuiScrollPanel(rect, rect, scroll: [*c]Vector2) Rectangle;
-//     rl.GuiToggleGroup(rect, string, 1) c_int;
-//     rl.GuiComboBox(rect, string, 1) c_int;
-//     rl.GuiSlider(rect, string, 1.0, 1.0, 1.0, showValue: bool) f32;
-//     rl.GuiSliderBar(rect, string, 1.0, 1.0, 1.0, showValue: bool) f32;
-//     rl.GuiProgressBar(rect, string, 1.0, 1.0, 1.0, showValue: bool) f32;
-//     rl.GuiScrollBar(rect, 1, 1, 1) c_int;
-//     rl.GuiGrid(rect, 1.0, 1) Vector2;
-//     rl.GuiMessageBox(rect, string, string, string) c_int;
-//     rl.GuiTextInputBox(rect, string, string, text: [*c]u8, string) c_int;
-//     rl.GuiColorPicker(rect, color) Color;
-//     rl.GetPhysicsBodiesCount() c_int;
-//     rl.GetPhysicsBody(1) PhysicsBody;
-//     rl.GetPhysicsShapeType(1) c_int;
-//     rl.GetPhysicsShapeVerticesCount(1) c_int;
-//     rl.GetPhysicsShapeVertex(body: PhysicsBody, 1) Vector2;
-//     rl.GetScreenWidth() c_int;
-//     rl.GetScreenHeight() c_int;
-//     rl.GetMonitorCount() c_int;
-//     rl.GetMonitorWidth(1) c_int;
-//     rl.GetMonitorHeight(1) c_int;
-//     rl.GetMonitorPhysicalWidth(1) c_int;
-//     rl.GetMonitorPhysicalHeight(1) c_int;
-//     rl.GetWindowPosition() Vector2;
-//     rl.GetCameraMatrix(cam3) Matrix;
-//     rl.GetCameraMatrix2D(cam2) Matrix;
-//     rl.GetFPS() c_int;
-//     rl.GetFrameTime() f32;
-//     rl.GetTime() f64;
-//     rl.ColorToInt(color) c_int;
-//     rl.ColorNormalize(color) Vector4;
-//     rl.ColorToHSV(color) Vector3;
-//     rl.GetColor(1) Color;
-//     rl.Fade(color, 1.0) Color;
-//     rl.GetRandomValue(1, 1) c_int;
-//     rl.GetFileModTime(string) c_long;
-//     rl.StorageLoadValue(1) c_int;
-//     rl.GetKeyPressed() c_int;
-//     rl.GetGamepadButtonPressed() c_int;
-//     rl.GetGamepadAxisCount(1) c_int;
-//     rl.GetGamepadAxisMovement(1, 1) f32;
-//     rl.GetMouseX() c_int;
-//     rl.GetMouseY() c_int;
-//     rl.GetMousePosition() Vector2;
-//     rl.GetMouseWheelMove() c_int;
-//     rl.GetTouchX() c_int;
-//     rl.GetTouchY() c_int;
-//     rl.GetTouchPosition(1) Vector2;
-//     rl.GetGestureDetected() c_int;
-//     rl.GetTouchPointsCount() c_int;
-//     rl.GetGestureHoldDuration() f32;
-//     rl.GetGestureDragVector() Vector2;
-//     rl.GetGestureDragAngle() f32;
-//     rl.GetGesturePinchVector() Vector2;
-//     rl.GetGesturePinchAngle() f32;
-//     rl.GetCollisionRec(rect, rect) Rectangle;
-//     rl.LoadImage(string) Image;
-//     rl.LoadImageEx(pixels: [*c]Color, 1, 1) Image;
-//     rl.LoadImagePro(data: ?*c_void, 1, 1, 1) Image;
-//     rl.LoadImageRaw(string, 1, 1, 1, 1) Image;
-//     rl.LoadTexture(string) Texture2D;
-//     rl.LoadTextureFromImage(image) Texture2D;
-//     rl.LoadTextureCubemap(image, 1) TextureCubemap;
-//     rl.LoadRenderTexture(1, 1) RenderTexture2D;
-//     rl.GetImageAlphaBorder(image, 1.0) Rectangle;
-//     rl.GetPixelDataSize(1, 1, 1) c_int;
-//     rl.GetTextureData(txt) Image;
-//     rl.GetScreenData() Image;
-//     rl.ImageCopy(image) Image;
-//     rl.ImageFromImage(image, rect) Image;
-//     rl.ImageText(string, 1, color) Image;
-//     rl.ImageTextEx(font: Font, string, 1.0, 1.0, color) Image;
-//     rl.GenImageColor(1, 1, color) Image;
-//     rl.GenImageGradientV(1, 1, color, color) Image;
-//     rl.GenImageGradientH(1, 1, color, color) Image;
-//     rl.GenImageGradientRadial(1, 1, 1.0, color, color) Image;
-//     rl.GenImageChecked(1, 1, 1, 1, color, color) Image;
-//     rl.GenImageWhiteNoise(1, 1, 1.0) Image;
-//     rl.GenImagePerlinNoise(1, 1, 1, 1, 1.0) Image;
-//     rl.GenImageCellular(1, 1, 1) Image;
-//     rl.GetFontDefault() Font;
-//     rl.LoadFont(string) Font;
-//     rl.LoadFontEx(string, 1, fontChars: [*c]c_int, 1) Font;
-//     rl.LoadFontFromImage(image, color, 1) Font;
-//     rl.GenImageFontAtlas(chars: [*c]const CharInfo, recs: [*c][*c]Rectangle, 1, 1, 1, 1) Image;
-//     rl.MeasureText(string, 1) c_int;
-//     rl.MeasureTextEx(font: Font, string, 1.0, 1.0) Vector2;
-//     rl.GetGlyphIndex(font: Font, 1) c_int;
-//     rl.TextCopy(dst: [*c]u8, string) c_int;
-//     rl.TextLength(string) c_uint;
-//     rl.TextFindIndex(string, string) c_int;
-//     rl.TextToInteger(string) c_int;
-//     rl.GetCodepointsCount(string) c_int;
-//     rl.GetNextCodepoint(string, bytesProcessed: [*c]c_int) c_int;
-//     rl.LoadModel(string) Model;
-//     rl.LoadModelFromMesh(mesh: Mesh) Model;
-//     rl.LoadMaterialDefault() Material;
-//     rl.GenMeshPoly(1, 1.0) Mesh;
-//     rl.GenMeshPlane(1.0, 1.0, 1, 1) Mesh;
-//     rl.GenMeshCube(1.0, 1.0, 1.0) Mesh;
-//     rl.GenMeshSphere(1.0, 1, 1) Mesh;
-//     rl.GenMeshHemiSphere(1.0, 1, 1) Mesh;
-//     rl.GenMeshCylinder(1.0, 1.0, 1) Mesh;
-//     rl.GenMeshTorus(1.0, 1.0, 1, 1) Mesh;
-//     rl.GenMeshKnot(1.0, 1.0, 1, 1) Mesh;
-//     rl.MeshBoundingBox(mesh: Mesh) BoundingBox;
-//     rl.GetCollisionRayModel(ray: Ray, model: Model) RayHitInfo;
-//     rl.GetCollisionRayGround(ray: Ray, 1.0) RayHitInfo;
-//     rl.LoadShader(string, string) Shader;
-//     rl.LoadShaderCode(string, string) Shader;
-//     rl.GetShaderDefault() Shader;
-//     rl.GetTextureDefault() Texture2D;
-//     rl.GetShapesTexture() Texture2D;
-//     rl.GetShapesTextureRec() Rectangle;
-//     rl.GetShaderLocation(shader: Shader, string) c_int;
-//     rl.GetMatrixModelview() Matrix;
-//     rl.GetMatrixProjection() Matrix;
-//     rl.GenTextureCubemap(shader: Shader, txt, 1) Texture2D;
-//     rl.GenTextureIrradiance(shader: Shader, txt, 1) Texture2D;
-//     rl.GenTexturePrefilter(shader: Shader, txt, 1) Texture2D;
-//     rl.GenTextureBRDF(shader: Shader, 1) Texture2D;
-//     rl.LoadWave(string) Wave;
-//     rl.LoadSound(string) Sound;
-//     rl.LoadSoundFromWave(wave: Wave) Sound;
-//     rl.GetSoundsPlaying() c_int;
-//     rl.WaveCopy(wave: Wave) Wave;
-//     rl.LoadMusicStream(string) Music;
-//     rl.GetMusicTimeLength(music: Music) f32;
-//     rl.GetMusicTimePlayed(music: Music) f32;
-//     rl.InitAudioStream(1, 1, 1) AudioStream;
-//     rl.GuiGetStyle(1, 1) c_int;
-//     rl.GuiScrollPanel(rect, rect, scroll: [*c]Vector2) Rectangle;
-//     rl.GuiToggleGroup(rect, string, 1) c_int;
-//     rl.GuiComboBox(rect, string, 1) c_int;
-//     rl.GuiSlider(rect, string, 1.0, 1.0, 1.0, showValue: bool) f32;
-//     rl.GuiSliderBar(rect, string, 1.0, 1.0, 1.0, showValue: bool) f32;
-//     rl.GuiProgressBar(rect, string, 1.0, 1.0, 1.0, showValue: bool) f32;
-//     rl.GuiScrollBar(rect, 1, 1, 1) c_int;
-//     rl.GuiGrid(rect, 1.0, 1) Vector2;
-//     rl.GuiMessageBox(rect, string, string, string) c_int;
-//     rl.GuiTextInputBox(rect, string, string, text: [*c]u8, string) c_int;
-//     rl.GuiColorPicker(rect, color) Color;
-//     rl.GetPhysicsBodiesCount() c_int;
-//     rl.GetPhysicsBody(1) PhysicsBody;
-//     rl.GetPhysicsShapeType(1) c_int;
-//     rl.GetPhysicsShapeVerticesCount(1) c_int;
-//     rl.GetPhysicsShapeVertex(body: PhysicsBody, 1) Vector2;
+    rl.UnloadShader(shader);
+    rl.UnloadSound(sound);
+    rl.UnloadTexture(txt);
+    rl.UnloadWave(wave);
+    rl.UpdateAudioStream(astream, null, 1);
+    rl.UpdateCamera(&cam3);
+    rl.UpdateCamera(null);
+    rl.UpdateModelAnimation(model, modelAnimation, 1);
+    rl.UpdateMusicStream(music);
+    rl.UpdateSound(sound, null, 1);
+    rl.UpdateTexture(txt, null);
+    rl.UpdateVrTracking(null);
+    _ = rl.WaveCopy(wave);
+    rl.WaveCrop(null, 1, 1);
+    rl.WaveFormat(null, 1, 1, 1);
+    _ = rl.WindowShouldClose();
 }
 
 //     rl.TraceLog(1, string, ...)
+//    rl.TraceLog(1, string, ...)
+//    _ = rl.TextFormat(string, ...);
+//    _ = rl.TextFormat(string, ...);
