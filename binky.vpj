@@ -1,0 +1,427 @@
+<!DOCTYPE Project SYSTEM "http://www.slickedit.com/dtd/vse/10.0/vpj.dtd">
+<Project
+    Version="10.0"
+    VendorName="SlickEdit"
+    TemplateName="(Other)"
+    WorkingDir=".">
+    <Config
+        Name="Release"
+        OutputFile=""
+        CompilerConfigName="">
+        <Menu>
+            <Target
+                Name="Compile"
+                MenuCaption="&amp;Compile"
+                CaptureOutputWith="ProcessBuffer"
+                SaveOption="SaveCurrent"
+                RunFromDir="%rw">
+                <Exec/>
+            </Target>
+            <Target
+                Name="Build"
+                MenuCaption="&amp;Build"
+                CaptureOutputWith="ProcessBuffer"
+                SaveOption="SaveWorkspaceFiles"
+                RunFromDir="%rw"
+                ClearProcessBuffer="1">
+                <Exec CmdLine="zig build "/>
+            </Target>
+            <Target
+                Name="Rebuild"
+                MenuCaption="&amp;Rebuild"
+                CaptureOutputWith="ProcessBuffer"
+                SaveOption="SaveWorkspaceFiles"
+                RunFromDir="%rw">
+                <Exec/>
+            </Target>
+            <Target
+                Name="Debug"
+                MenuCaption="&amp;Debug"
+                SaveOption="SaveNone"
+                RunFromDir="%rw">
+                <Exec/>
+            </Target>
+            <Target
+                Name="Execute"
+                MenuCaption="E&amp;xecute"
+                SaveOption="SaveNone"
+                RunFromDir="%rw"
+                CaptureOutputWith="ProcessBuffer">
+                <Exec CmdLine="zig build run"/>
+            </Target>
+        </Menu>
+    </Config>
+    <CustomFolders>
+        <Folder
+            Name="Source Files"
+            Filters="*.c;*.C;*.cc;*.cpp;*.cp;*.cxx;*.c++;*.prg;*.pas;*.dpr;*.asm;*.s;*.bas;*.java;*.cs;*.sc;*.scala;*.e;*.cob;*.html;*.rc;*.tcl;*.py;*.pl;*.d;*.m;*.mm;*.go;*.groovy;*.gsh"
+            GUID="{FE657B36-3CE7-4ADA-B63A-417C82F20B50}"></Folder>
+        <Folder
+            Name="Header Files"
+            Filters="*.h;*.H;*.hh;*.hpp;*.hxx;*.h++;*.inc;*.sh;*.cpy;*.if"
+            GUID="{18F1FE18-C241-4AF8-8789-83A328D71150}"></Folder>
+        <Folder
+            Name="Resource Files"
+            Filters="*.ico;*.cur;*.dlg"
+            GUID="{D7B281A1-1315-4964-A243-2FBED41C11EC}"/>
+        <Folder
+            Name="Bitmaps"
+            Filters="*.bmp"
+            GUID="{8F6FC66B-6C00-4740-ACFA-6C493CB5A18C}"/>
+        <Folder
+            Name="Other Files"
+            Filters=""
+            GUID="{3EB609B4-73C6-4635-AAED-DB57D380ECA1}"></Folder>
+    </CustomFolders>
+    <Files AutoFolders="DirectoryView">
+        <Folder Name="src">
+            <F N="src/abitest.zig"/>
+            <F N="src/main.zig"/>
+            <F N="src/raylib.zig"/>
+            <F N="src/rayshims.c"/>
+        </Folder>
+        <Folder Name="utils">
+            <F N="utils/genshims.zig"/>
+        </Folder>
+        <Folder Name="vendor">
+            <Folder Name="raylib">
+                <Folder Name="games">
+                    <Folder Name="cat_vs_roomba">
+                        <Folder Name="screens">
+                            <F N="vendor/raylib/games/cat_vs_roomba/screens/screen_ending.c"/>
+                            <F N="vendor/raylib/games/cat_vs_roomba/screens/screen_gameplay.c"/>
+                            <F N="vendor/raylib/games/cat_vs_roomba/screens/screen_logo.c"/>
+                            <F N="vendor/raylib/games/cat_vs_roomba/screens/screen_title.c"/>
+                            <F N="vendor/raylib/games/cat_vs_roomba/screens/screens.h"/>
+                        </Folder>
+                        <F N="vendor/raylib/games/cat_vs_roomba/raymath.h"/>
+                        <F N="vendor/raylib/games/cat_vs_roomba/roomba.c"/>
+                    </Folder>
+                    <Folder Name="drturtle">
+                        <F N="vendor/raylib/games/drturtle/00_drturtle_screens.c"/>
+                        <F N="vendor/raylib/games/drturtle/01_drturtle_scrolling.c"/>
+                        <F N="vendor/raylib/games/drturtle/02_drturtle_player.c"/>
+                        <F N="vendor/raylib/games/drturtle/03_drturtle_enemies.c"/>
+                        <F N="vendor/raylib/games/drturtle/04_drturtle_gui.c"/>
+                        <F N="vendor/raylib/games/drturtle/05_drturtle_audio.c"/>
+                        <F N="vendor/raylib/games/drturtle/06_drturtle_final.c"/>
+                        <F N="vendor/raylib/games/drturtle/drturtle_final_web.c"/>
+                    </Folder>
+                    <Folder Name="just_do">
+                        <Folder Name="screens">
+                            <F N="vendor/raylib/games/just_do/screens/screen_level00.c"/>
+                            <F N="vendor/raylib/games/just_do/screens/screen_level01.c"/>
+                            <F N="vendor/raylib/games/just_do/screens/screen_level02.c"/>
+                            <F N="vendor/raylib/games/just_do/screens/screen_level03.c"/>
+                            <F N="vendor/raylib/games/just_do/screens/screen_level04.c"/>
+                            <F N="vendor/raylib/games/just_do/screens/screen_level05.c"/>
+                            <F N="vendor/raylib/games/just_do/screens/screen_level06.c"/>
+                            <F N="vendor/raylib/games/just_do/screens/screen_level07.c"/>
+                            <F N="vendor/raylib/games/just_do/screens/screen_level08.c"/>
+                            <F N="vendor/raylib/games/just_do/screens/screen_level09.c"/>
+                            <F N="vendor/raylib/games/just_do/screens/screen_level10.c"/>
+                            <F N="vendor/raylib/games/just_do/screens/screen_logo.c"/>
+                            <F N="vendor/raylib/games/just_do/screens/screens.h"/>
+                        </Folder>
+                        <F N="vendor/raylib/games/just_do/just_do.c"/>
+                    </Folder>
+                    <Folder Name="koala_seasons">
+                        <Folder Name="screens">
+                            <F N="vendor/raylib/games/koala_seasons/screens/atlas01.h"/>
+                            <F N="vendor/raylib/games/koala_seasons/screens/atlas02.h"/>
+                            <F N="vendor/raylib/games/koala_seasons/screens/screen_ending.c"/>
+                            <F N="vendor/raylib/games/koala_seasons/screens/screen_gameplay.c"/>
+                            <F N="vendor/raylib/games/koala_seasons/screens/screen_logo.c"/>
+                            <F N="vendor/raylib/games/koala_seasons/screens/screen_title.c"/>
+                            <F N="vendor/raylib/games/koala_seasons/screens/screens.h"/>
+                        </Folder>
+                        <F N="vendor/raylib/games/koala_seasons/koala_seasons.c"/>
+                    </Folder>
+                    <Folder Name="light_my_ritual">
+                        <Folder Name="screens">
+                            <F N="vendor/raylib/games/light_my_ritual/screens/screen_gameplay.c"/>
+                            <F N="vendor/raylib/games/light_my_ritual/screens/screen_logo_raylib.c"/>
+                            <F N="vendor/raylib/games/light_my_ritual/screens/screen_title.c"/>
+                            <F N="vendor/raylib/games/light_my_ritual/screens/screens.h"/>
+                        </Folder>
+                        <F N="vendor/raylib/games/light_my_ritual/light_my_ritual.c"/>
+                    </Folder>
+                    <Folder Name="repair">
+                        <Folder Name="screens">
+                            <F N="vendor/raylib/games/repair/screens/screen_ending.c"/>
+                            <F N="vendor/raylib/games/repair/screens/screen_gameplay.c"/>
+                            <F N="vendor/raylib/games/repair/screens/screen_logo.c"/>
+                            <F N="vendor/raylib/games/repair/screens/screen_title.c"/>
+                            <F N="vendor/raylib/games/repair/screens/screens.h"/>
+                        </Folder>
+                        <F N="vendor/raylib/games/repair/repair.c"/>
+                    </Folder>
+                    <Folder Name="skully_escape">
+                        <Folder Name="screens">
+                            <F N="vendor/raylib/games/skully_escape/screens/screen_aisle01.c"/>
+                            <F N="vendor/raylib/games/skully_escape/screens/screen_aisle02.c"/>
+                            <F N="vendor/raylib/games/skully_escape/screens/screen_armory.c"/>
+                            <F N="vendor/raylib/games/skully_escape/screens/screen_attic.c"/>
+                            <F N="vendor/raylib/games/skully_escape/screens/screen_bathroom.c"/>
+                            <F N="vendor/raylib/games/skully_escape/screens/screen_ending.c"/>
+                            <F N="vendor/raylib/games/skully_escape/screens/screen_kitchen.c"/>
+                            <F N="vendor/raylib/games/skully_escape/screens/screen_livingroom.c"/>
+                            <F N="vendor/raylib/games/skully_escape/screens/screen_logo.c"/>
+                            <F N="vendor/raylib/games/skully_escape/screens/screen_logo_raylib.c"/>
+                            <F N="vendor/raylib/games/skully_escape/screens/screen_title.c"/>
+                            <F N="vendor/raylib/games/skully_escape/screens/screens.h"/>
+                        </Folder>
+                        <F N="vendor/raylib/games/skully_escape/monster.c"/>
+                        <F N="vendor/raylib/games/skully_escape/monster.h"/>
+                        <F N="vendor/raylib/games/skully_escape/player.c"/>
+                        <F N="vendor/raylib/games/skully_escape/player.h"/>
+                        <F N="vendor/raylib/games/skully_escape/skully_escape.c"/>
+                    </Folder>
+                    <Folder Name="transmission">
+                        <Folder Name="screens">
+                            <F N="vendor/raylib/games/transmission/screens/screen_ending.c"/>
+                            <F N="vendor/raylib/games/transmission/screens/screen_gameplay.c"/>
+                            <F N="vendor/raylib/games/transmission/screens/screen_logo.c"/>
+                            <F N="vendor/raylib/games/transmission/screens/screen_mission.c"/>
+                            <F N="vendor/raylib/games/transmission/screens/screen_title.c"/>
+                            <F N="vendor/raylib/games/transmission/screens/screens.h"/>
+                        </Folder>
+                        <F N="vendor/raylib/games/transmission/transmission.c"/>
+                    </Folder>
+                    <Folder Name="wave_collector">
+                        <Folder Name="screens">
+                            <F N="vendor/raylib/games/wave_collector/screens/screen_ending.c"/>
+                            <F N="vendor/raylib/games/wave_collector/screens/screen_gameplay.c"/>
+                            <F N="vendor/raylib/games/wave_collector/screens/screen_logo.c"/>
+                            <F N="vendor/raylib/games/wave_collector/screens/screen_title.c"/>
+                            <F N="vendor/raylib/games/wave_collector/screens/screens.h"/>
+                        </Folder>
+                        <F N="vendor/raylib/games/wave_collector/wave_collector.c"/>
+                    </Folder>
+                    <F N="vendor/raylib/games/arkanoid.c"/>
+                    <F N="vendor/raylib/games/asteroids.c"/>
+                    <F N="vendor/raylib/games/asteroids_survival.c"/>
+                    <F N="vendor/raylib/games/floppy.c"/>
+                    <F N="vendor/raylib/games/gold_fever.c"/>
+                    <F N="vendor/raylib/games/gorilas.c"/>
+                    <F N="vendor/raylib/games/missile_commander.c"/>
+                    <F N="vendor/raylib/games/pang.c"/>
+                    <F N="vendor/raylib/games/snake.c"/>
+                    <F N="vendor/raylib/games/space_invaders.c"/>
+                    <F N="vendor/raylib/games/tetris.c"/>
+                </Folder>
+                <Folder Name="projects">
+                    <Folder Name="4coder">
+                        <F N="vendor/raylib/projects/4coder/main.c"/>
+                    </Folder>
+                    <Folder Name="CMake">
+                        <F N="vendor/raylib/projects/CMake/core_basic_window.c"/>
+                    </Folder>
+                    <Folder Name="CodeBlocks">
+                        <F N="vendor/raylib/projects/CodeBlocks/core_basic_window.c"/>
+                    </Folder>
+                    <Folder Name="Geany">
+                        <F N="vendor/raylib/projects/Geany/core_basic_window.c"/>
+                    </Folder>
+                    <Folder Name="Notepad++">
+                        <Folder Name="raylib_npp_parser">
+                            <F N="vendor/raylib/projects/Notepad++/raylib_npp_parser/raylib_npp_parser.c"/>
+                            <F N="vendor/raylib/projects/Notepad++/raylib_npp_parser/raylib_to_parse.h"/>
+                        </Folder>
+                    </Folder>
+                    <Folder Name="scripts">
+                        <F N="vendor/raylib/projects/scripts/core_basic_window.c"/>
+                    </Folder>
+                    <Folder Name="VS2017.UWP">
+                        <Folder Name="raylib.App.UWP">
+                            <F N="vendor/raylib/projects/VS2017.UWP/raylib.App.UWP/App.h"/>
+                            <F N="vendor/raylib/projects/VS2017.UWP/raylib.App.UWP/BaseApp.h"/>
+                            <F N="vendor/raylib/projects/VS2017.UWP/raylib.App.UWP/pch.h"/>
+                        </Folder>
+                    </Folder>
+                    <Folder Name="VSCode">
+                        <F N="vendor/raylib/projects/VSCode/main.c"/>
+                    </Folder>
+                </Folder>
+                <Folder Name="src">
+                    <Folder Name="external">
+                        <Folder Name="android">
+                            <Folder Name="native_app_glue">
+                                <F N="vendor/raylib/src/external/android/native_app_glue/android_native_app_glue.c"/>
+                                <F N="vendor/raylib/src/external/android/native_app_glue/android_native_app_glue.h"/>
+                            </Folder>
+                        </Folder>
+                        <Folder Name="ANGLE">
+                            <Folder Name="EGL">
+                                <F N="vendor/raylib/src/external/ANGLE/EGL/egl.h"/>
+                                <F N="vendor/raylib/src/external/ANGLE/EGL/eglext.h"/>
+                                <F N="vendor/raylib/src/external/ANGLE/EGL/eglplatform.h"/>
+                            </Folder>
+                            <Folder Name="GLES2">
+                                <F N="vendor/raylib/src/external/ANGLE/GLES2/gl2.h"/>
+                                <F N="vendor/raylib/src/external/ANGLE/GLES2/gl2ext.h"/>
+                                <F N="vendor/raylib/src/external/ANGLE/GLES2/gl2platform.h"/>
+                            </Folder>
+                            <Folder Name="GLES3">
+                                <F N="vendor/raylib/src/external/ANGLE/GLES3/gl3.h"/>
+                                <F N="vendor/raylib/src/external/ANGLE/GLES3/gl3ext.h"/>
+                                <F N="vendor/raylib/src/external/ANGLE/GLES3/gl3platform.h"/>
+                            </Folder>
+                            <Folder Name="KHR">
+                                <F N="vendor/raylib/src/external/ANGLE/KHR/khrplatform.h"/>
+                            </Folder>
+                            <F N="vendor/raylib/src/external/ANGLE/angle_windowsstore.h"/>
+                        </Folder>
+                        <Folder Name="glfw">
+                            <Folder Name="deps">
+                                <Folder Name="glad">
+                                    <F N="vendor/raylib/src/external/glfw/deps/glad/gl.h"/>
+                                    <F N="vendor/raylib/src/external/glfw/deps/glad/khrplatform.h"/>
+                                    <F N="vendor/raylib/src/external/glfw/deps/glad/vk_platform.h"/>
+                                    <F N="vendor/raylib/src/external/glfw/deps/glad/vulkan.h"/>
+                                </Folder>
+                                <Folder Name="mingw">
+                                    <F N="vendor/raylib/src/external/glfw/deps/mingw/_mingw_dxhelper.h"/>
+                                    <F N="vendor/raylib/src/external/glfw/deps/mingw/dinput.h"/>
+                                    <F N="vendor/raylib/src/external/glfw/deps/mingw/xinput.h"/>
+                                </Folder>
+                                <Folder Name="vs2008">
+                                    <F N="vendor/raylib/src/external/glfw/deps/vs2008/stdint.h"/>
+                                </Folder>
+                                <F N="vendor/raylib/src/external/glfw/deps/getopt.c"/>
+                                <F N="vendor/raylib/src/external/glfw/deps/getopt.h"/>
+                                <F N="vendor/raylib/src/external/glfw/deps/glad_gl.c"/>
+                                <F N="vendor/raylib/src/external/glfw/deps/glad_vulkan.c"/>
+                            </Folder>
+                            <Folder Name="include">
+                                <Folder Name="GLFW">
+                                    <F N="vendor/raylib/src/external/glfw/include/GLFW/glfw3.h"/>
+                                    <F N="vendor/raylib/src/external/glfw/include/GLFW/glfw3native.h"/>
+                                </Folder>
+                            </Folder>
+                            <Folder Name="src">
+                                <F N="vendor/raylib/src/external/glfw/src/cocoa_joystick.h"/>
+                                <F N="vendor/raylib/src/external/glfw/src/cocoa_platform.h"/>
+                                <F N="vendor/raylib/src/external/glfw/src/cocoa_time.c"/>
+                                <F N="vendor/raylib/src/external/glfw/src/context.c"/>
+                                <F N="vendor/raylib/src/external/glfw/src/egl_context.c"/>
+                                <F N="vendor/raylib/src/external/glfw/src/egl_context.h"/>
+                                <F N="vendor/raylib/src/external/glfw/src/glx_context.c"/>
+                                <F N="vendor/raylib/src/external/glfw/src/glx_context.h"/>
+                                <F N="vendor/raylib/src/external/glfw/src/init.c"/>
+                                <F N="vendor/raylib/src/external/glfw/src/input.c"/>
+                                <F N="vendor/raylib/src/external/glfw/src/internal.h"/>
+                                <F N="vendor/raylib/src/external/glfw/src/linux_joystick.c"/>
+                                <F N="vendor/raylib/src/external/glfw/src/linux_joystick.h"/>
+                                <F N="vendor/raylib/src/external/glfw/src/mappings.h"/>
+                                <F N="vendor/raylib/src/external/glfw/src/monitor.c"/>
+                                <F N="vendor/raylib/src/external/glfw/src/nsgl_context.h"/>
+                                <F N="vendor/raylib/src/external/glfw/src/null_init.c"/>
+                                <F N="vendor/raylib/src/external/glfw/src/null_joystick.c"/>
+                                <F N="vendor/raylib/src/external/glfw/src/null_joystick.h"/>
+                                <F N="vendor/raylib/src/external/glfw/src/null_monitor.c"/>
+                                <F N="vendor/raylib/src/external/glfw/src/null_platform.h"/>
+                                <F N="vendor/raylib/src/external/glfw/src/null_window.c"/>
+                                <F N="vendor/raylib/src/external/glfw/src/osmesa_context.c"/>
+                                <F N="vendor/raylib/src/external/glfw/src/osmesa_context.h"/>
+                                <F N="vendor/raylib/src/external/glfw/src/posix_thread.c"/>
+                                <F N="vendor/raylib/src/external/glfw/src/posix_thread.h"/>
+                                <F N="vendor/raylib/src/external/glfw/src/posix_time.c"/>
+                                <F N="vendor/raylib/src/external/glfw/src/posix_time.h"/>
+                                <F N="vendor/raylib/src/external/glfw/src/vulkan.c"/>
+                                <F N="vendor/raylib/src/external/glfw/src/wgl_context.c"/>
+                                <F N="vendor/raylib/src/external/glfw/src/wgl_context.h"/>
+                                <F N="vendor/raylib/src/external/glfw/src/win32_init.c"/>
+                                <F N="vendor/raylib/src/external/glfw/src/win32_joystick.c"/>
+                                <F N="vendor/raylib/src/external/glfw/src/win32_joystick.h"/>
+                                <F N="vendor/raylib/src/external/glfw/src/win32_monitor.c"/>
+                                <F N="vendor/raylib/src/external/glfw/src/win32_platform.h"/>
+                                <F N="vendor/raylib/src/external/glfw/src/win32_thread.c"/>
+                                <F N="vendor/raylib/src/external/glfw/src/win32_time.c"/>
+                                <F N="vendor/raylib/src/external/glfw/src/win32_window.c"/>
+                                <F N="vendor/raylib/src/external/glfw/src/window.c"/>
+                                <F N="vendor/raylib/src/external/glfw/src/wl_init.c"/>
+                                <F N="vendor/raylib/src/external/glfw/src/wl_monitor.c"/>
+                                <F N="vendor/raylib/src/external/glfw/src/wl_platform.h"/>
+                                <F N="vendor/raylib/src/external/glfw/src/wl_window.c"/>
+                                <F N="vendor/raylib/src/external/glfw/src/x11_init.c"/>
+                                <F N="vendor/raylib/src/external/glfw/src/x11_monitor.c"/>
+                                <F N="vendor/raylib/src/external/glfw/src/x11_platform.h"/>
+                                <F N="vendor/raylib/src/external/glfw/src/x11_window.c"/>
+                                <F N="vendor/raylib/src/external/glfw/src/xkb_unicode.c"/>
+                                <F N="vendor/raylib/src/external/glfw/src/xkb_unicode.h"/>
+                            </Folder>
+                        </Folder>
+                        <F N="vendor/raylib/src/external/cgltf.h"/>
+                        <F N="vendor/raylib/src/external/dirent.h"/>
+                        <F N="vendor/raylib/src/external/dr_flac.h"/>
+                        <F N="vendor/raylib/src/external/dr_mp3.h"/>
+                        <F N="vendor/raylib/src/external/dr_wav.h"/>
+                        <F N="vendor/raylib/src/external/glad.h"/>
+                        <F N="vendor/raylib/src/external/jar_mod.h"/>
+                        <F N="vendor/raylib/src/external/jar_xm.h"/>
+                        <F N="vendor/raylib/src/external/miniaudio.h"/>
+                        <F N="vendor/raylib/src/external/par_shapes.h"/>
+                        <F N="vendor/raylib/src/external/rgif.h"/>
+                        <F N="vendor/raylib/src/external/stb_image.h"/>
+                        <F N="vendor/raylib/src/external/stb_image_resize.h"/>
+                        <F N="vendor/raylib/src/external/stb_image_write.h"/>
+                        <F N="vendor/raylib/src/external/stb_perlin.h"/>
+                        <F N="vendor/raylib/src/external/stb_rect_pack.h"/>
+                        <F N="vendor/raylib/src/external/stb_truetype.h"/>
+                        <F N="vendor/raylib/src/external/stb_vorbis.h"/>
+                        <F N="vendor/raylib/src/external/tinyobj_loader_c.h"/>
+                    </Folder>
+                    <F N="vendor/raylib/src/camera.h"/>
+                    <F N="vendor/raylib/src/config.h"/>
+                    <F N="vendor/raylib/src/core.c"/>
+                    <F N="vendor/raylib/src/easings.h"/>
+                    <F N="vendor/raylib/src/gestures.h"/>
+                    <F N="vendor/raylib/src/models.c"/>
+                    <F N="vendor/raylib/src/physac.h"/>
+                    <F N="vendor/raylib/src/raudio.c"/>
+                    <F N="vendor/raylib/src/raudio.h"/>
+                    <F N="vendor/raylib/src/raylib.h"/>
+                    <F N="vendor/raylib/src/raymath.h"/>
+                    <F N="vendor/raylib/src/rglfw.c"/>
+                    <F N="vendor/raylib/src/rlgl.h"/>
+                    <F N="vendor/raylib/src/rmem.h"/>
+                    <F N="vendor/raylib/src/rnet.h"/>
+                    <F N="vendor/raylib/src/shapes.c"/>
+                    <F N="vendor/raylib/src/text.c"/>
+                    <F N="vendor/raylib/src/textures.c"/>
+                    <F N="vendor/raylib/src/utils.c"/>
+                    <F N="vendor/raylib/src/utils.h"/>
+                </Folder>
+                <Folder Name="templates">
+                    <Folder Name="advance_game">
+                        <Folder Name="screens">
+                            <F N="vendor/raylib/templates/advance_game/screens/screen_ending.c"/>
+                            <F N="vendor/raylib/templates/advance_game/screens/screen_gameplay.c"/>
+                            <F N="vendor/raylib/templates/advance_game/screens/screen_logo.c"/>
+                            <F N="vendor/raylib/templates/advance_game/screens/screen_options.c"/>
+                            <F N="vendor/raylib/templates/advance_game/screens/screen_title.c"/>
+                            <F N="vendor/raylib/templates/advance_game/screens/screens.h"/>
+                        </Folder>
+                        <F N="vendor/raylib/templates/advance_game/advance_game.c"/>
+                    </Folder>
+                    <Folder Name="simple_game">
+                        <F N="vendor/raylib/templates/simple_game/simple_game.c"/>
+                    </Folder>
+                    <Folder Name="standard_game">
+                        <Folder Name="screens">
+                            <F N="vendor/raylib/templates/standard_game/screens/screen_ending.c"/>
+                            <F N="vendor/raylib/templates/standard_game/screens/screen_gameplay.c"/>
+                            <F N="vendor/raylib/templates/standard_game/screens/screen_logo.c"/>
+                            <F N="vendor/raylib/templates/standard_game/screens/screen_options.c"/>
+                            <F N="vendor/raylib/templates/standard_game/screens/screen_title.c"/>
+                            <F N="vendor/raylib/templates/standard_game/screens/screens.h"/>
+                        </Folder>
+                        <F N="vendor/raylib/templates/standard_game/standard_game.c"/>
+                    </Folder>
+                </Folder>
+            </Folder>
+        </Folder>
+        <F N="build.zig"/>
+    </Files>
+</Project>
