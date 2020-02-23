@@ -30,7 +30,8 @@ pub fn main() !void {
     var cOut = try fs.cwd().createFile("rayshims.c", .{ .read = false });
     var cStr = cOut.outStream();
 
-    try cOut.write("#include \"raylib.h\"\n#include \"physac.h\"\n\n");
+    try cOut.write("#include \"raylib.h\"\n#include \"physac.h\"\n");
+    try cOut.write("#define RAYGUIDEF\n#include \"raygui.h\"\n\n");
 
     defer std.heap.c_allocator.free(buf);
 

@@ -1,5 +1,7 @@
 #include "raylib.h"
 #include "physac.h"
+#define RAYGUIDEF
+#include "raygui.h"
 
 Ray GetMouseRayShim(Vector2 const* mousePosition, Camera camera)
 {
