@@ -1,5 +1,6 @@
 # Binky
-An experiment with binding to @raysan5/raylib using Zig (@ziglang/zig).
+An experiment with binding to [@raysan5/raylib](https://github.com/raysan5/raylib)
+using [Zig](https://github.com/ziglang/zig)
 
 Nothing important, just using the binding to get famliar with Zig.
 Raylib looked like a nice simple C library to bind to and play with 
