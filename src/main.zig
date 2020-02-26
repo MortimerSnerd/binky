@@ -37,6 +37,7 @@ pub fn main() void {
         rl.ClearBackground(WHITE);
         rl.DrawTexture(bgtx, 0, 0, WHITE);
         rl.DrawTexturePro(bgtx, srcRect, destRect, .{ .x = 0, .y = 0 }, 0, WHITE);
+        rl.DrawFPS(10, 10);
         rl.EndDrawing();
     }
 }
@@ -50,7 +51,7 @@ fn setupTx() void {
         c.* = .{ .r = 0, .g = 0, .b = 255, .a = 255 };
     }
 
-    var c: usize = 50;
+    var c: usize = 100;
     while (c > 0) : (c -= 1) {
         const x = Rng.random.uintLessThanBiased(u32, TxWidth);
         const y = Rng.random.uintLessThanBiased(u32, TxHeight);

@@ -47,7 +47,15 @@
                 SaveOption="SaveNone"
                 RunFromDir="%rw"
                 CaptureOutputWith="ProcessBuffer">
-                <Exec CmdLine="zig build run"/>
+                <Exec CmdLine="zig build run_simple"/>
+            </Target>
+            <Target
+                Name="Execute Fool"
+                MenuCaption="Execute Fool"
+                RunFromDir="%rw"
+                CaptureOutputWith="ProcessBuffer"
+                SaveOption="SaveNone">
+                <Exec CmdLine="zig build run_fool"/>
             </Target>
         </Menu>
     </Config>
