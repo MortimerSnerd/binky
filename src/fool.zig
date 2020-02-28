@@ -35,18 +35,53 @@ pub fn main() !void {
 }
 
 fn gameLoop(res: *Resources) void {
+    //DEBUGGERY
+    const ts = [_]u8 {1, 2, 2, 1};
+    var fs = FloorSection.init(ts[0..], .{.x = 10, .y = 10});  //testes
+
     while (!rl.WindowShouldClose()) {
         rl.BeginDrawing();
         rl.ClearBackground(.{ .r = 0, .g = 0, .b = 255, .a = 255 });
-        var idx: usize = 0;
-        while (idx < 10) : (idx += 1) {
-            res.bgmap.draw(idx, @intToFloat(f32, idx) * 32 * 3, 200, .{ .scale = 3 });
-        }
+        fs.draw(&res.bgmap, WHITE);
+//      var idx: usize = 0;
+//      while (idx < 10) : (idx += 1) {
+//          res.bgmap.draw(idx, @intToFloat(f32, idx) * 32 * 3, 200, .{ .scale = 3 });
+//      }
         rl.DrawTextEx(res.dfont, "Eat more cheese 0", .{ .x = 100, .y = 100 }, 30, 6.0, WHITE);
         rl.DrawFPS(10, 10);
         rl.EndDrawing();
     }
 }
+
+// TODO working in pixel coordinates can run into precision issues
+//       surprisingly fast.  Look at raylib 2d camera and see how it works,
+//       and if it is sufficient, or if we need to track camera position on our
+//       own, or some mix.
+
+// Horizontal floor section.
+const FloorSection = struct {
+    // unowned series of tile indices.
+    tiles: []const u8,
+
+    // Top left corner, in tile coordinates, not pixels.
+    topLeft: rl.Vector2,
+
+    pub fn init(tiles: [] const u8, pos: rl.Vector2) FloorSection {
+        return .{.tiles = tiles, .topLeft = pos };
+    }
+
+    pub fn draw(self: *FloorSection, tm: *TileMap, tint: rl.Color) void {
+        const spec = TileMap.ImgSpec{.tint = tint};
+        var i: usize = 0;
+        var x = self.topLeft.x * tm.gridWidth;
+        const y = self.topLeft.y * tm.gridHeight;
+
+        while (i < self.tiles.len) : (i += 1) {
+            tm.draw(self.tiles[i], x, y, spec);
+            x += tm.gridWidth;
+        }
+    }
+};
 
 // Texture with individual tiles of a regular grid.
 const TileMap = struct {
@@ -55,11 +90,6 @@ const TileMap = struct {
     gridHeight: f32,
     rects: []const rl.Rectangle,
     al: *mem.Allocator,
-
-    const Error = mem.Allocator.Error || error{
-        InvalidTexture,
-        BadGridDims,
-    };
 
     const ImgSpec = struct {
         rotation: f32 = 0,
@@ -78,11 +108,19 @@ const TileMap = struct {
                 .width = self.gridWidth * spec.scale,
                 .height = self.gridHeight * spec.scale,
             };
-            rl.DrawTexturePro(self.txt, self.rects[img_index], destRect, rl.Vector2{ .x = self.gridWidth * spec.center.x, .y = self.gridHeight * spec.center.y }, spec.rotation, spec.tint);
+
+            rl.DrawTexturePro(self.txt, self.rects[img_index], destRect,
+                              rl.Vector2{ .x = self.gridWidth * spec.center.x, .y = self.gridHeight * spec.center.y },
+                              spec.rotation, spec.tint);
         }
     }
 
-    pub fn init(al: *mem.Allocator, txt: rl.Texture, gridWidth: u16, gridHeight: u16) Error!@This() {
+    const Error = error {
+        InvalidTexture,
+        BadGridDims,
+    };
+
+    pub fn init(al: *mem.Allocator, txt: rl.Texture, gridWidth: u16, gridHeight: u16) !@This() {
         if (gridWidth == 0 or gridHeight == 0) return Error.BadGridDims;
         if (txt.width <= 0 or txt.height <= 0) return Error.InvalidTexture;
 
