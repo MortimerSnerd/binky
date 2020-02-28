@@ -60,3 +60,8 @@ I haven't tried this on any other platform than Linux.  The `build.zig`
 is dumb and just supplies Linux/X specific libraries as link targets.
 So you'll have work ahead of you if you want to compile on anything else.
 
+## TODOS
+- There are some things in raylib.zig that weren't translated, like the 
+   color constants, and some of the easing functions.  Some of those
+   might be simple fixes for translate\_c. Others may just need to be 
+   in the generation script, or manually.
