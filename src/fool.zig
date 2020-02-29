@@ -3,7 +3,9 @@ const mem = std.mem;
 const heap = std.heap;
 const rl = @import("raylib.zig");
 const warn = std.debug.warn;
+const panic = std.debug.panic;
 const assert = std.debug.assert;
+const maxInt = std.math.maxInt;
 
 const WinWidth = 800;
 const WinHeight = 600;
@@ -44,9 +46,8 @@ pub fn main() !void {
 
 fn gameLoop(res: *Resources) void {
     //DEBUGGERY
-    const ts = [_]u8 {1, 1, 1, 2};
-    var fs = FloorSection.init(ts[0..], .{.x = 10, .y = 10});  //testes
-    var xs = FloorSection.init(ts[0..], .{.x = 10, .y = 10});  //testes
+    const ts = [_]u8 {0, 2, 16, 18};
+    var tb = TileBlock.init(ts[0..], 2, 2) catch unreachable;
 
     while (!rl.WindowShouldClose()) {
         const dT = rl.GetFrameTime();
@@ -60,8 +61,8 @@ fn gameLoop(res: *Resources) void {
         rl.BeginDrawing();
         rl.BeginMode2D(res.cam);
         rl.ClearBackground(.{ .r = 0, .g = 0, .b = 255, .a = 255 });
-        xs.draw(&res.bgmap, .{.r = 100, .g = 100, .b = 100, .a = 255}, 0.5, res.cam.target);
-        fs.draw(&res.bgmap, WHITE, 1.0, res.cam.target);
+        tb.draw(&res.bgmap, .{.x = 100, .y = 100}, .{.scaleOrigin = res.cam.target, .scale = 0.5});
+        tb.draw(&res.bgmap, .{.x = 100, .y = 100}, .{.scaleOrigin = res.cam.target});
         rl.EndMode2D();
         rl.DrawTextEx(res.dfont, "Eat more cheese 0", .{ .x = 100, .y = 100 }, 30, 6.0, WHITE);
         rl.DrawFPS(10, 10);
@@ -73,29 +74,83 @@ fn gameLoop(res: *Resources) void {
 //       surprisingly fast.  Look at raylib 2d camera and see how it works,
 //       and if it is sufficient, or if we need to track camera position on our
 //       own, or some mix.
+const TileIdx = u8;
+const TileBlock = struct {
+    // Unowned slice of tile indexes.
+    tiles: []const TileIdx,
 
-// Horizontal floor section.
-const FloorSection = struct {
-    // unowned series of tile indices.
-    tiles: []const u8,
+    // Width of the block of tiles.
+    width: u16,
 
-    // Top left corner, in tile coordinates, not pixels.
-    topLeft: rl.Vector2,
+    pub fn init(tiles: []const TileIdx, width: usize, height: usize) !TileBlock {
+        if (tiles.len > maxInt(u16) or width > maxInt(u16) or height > maxInt(u16)) return error.Overflow;
+        if (width == 0 or height == 0) return error.Underflow;
 
-    pub fn init(tiles: [] const u8, pos: rl.Vector2) FloorSection {
-        return .{.tiles = tiles, .topLeft = pos };
+        const tot = width * height;
+
+        if (tot > maxInt(u16)) return error.Overflow;
+        if (tot != tiles.len) return error.BadDimensions;
+
+        return TileBlock{
+            .tiles = tiles,
+            .width = @intCast(u16, width),
+        };
     }
 
-    pub fn draw(self: *FloorSection, tm: *TileMap, tint: rl.Color, scale: f32, ppos: rl.Vector2) void {
-        const spec = TileMap.ImgSpec{.tint = tint};
-        var i: usize = 0;
-        const tl = rl.Vector2{.x = self.topLeft.x * tm.gridWidth, .y = self.topLeft.y * tm.gridHeight};
-        var cpos = scaleAroundOrigin(tl, scale, ppos);
+    const DrawSpec = struct {
+        tint: rl.Color = WHITE,
+        scale: f32 = 1,
+        scaleOrigin: rl.Vector2 = .{.x = 0, .y = 0},
+    };
 
-        while (i < self.tiles.len) : (i += 1) {
-            tm.draw(self.tiles[i], cpos.x, cpos.y, spec);
-            cpos.x += tm.gridWidth;
+    pub fn draw(self: *TileBlock, tm: *TileMap, topLeft: rl.Vector2, spec: DrawSpec) void {
+        const sctl = scaleAroundOrigin(topLeft, spec.scale, spec.scaleOrigin);
+        const tmspec = TileMap.ImgSpec{.tint = spec.tint};
+        var iter = self.iterator(sctl);
+        var pos: rl.Vector2 = undefined;
+
+        while (iter.next(tm, &pos)) |img| {
+            tm.draw(img, pos.x, pos.y, tmspec);
         }
+    }
+
+    const TileIterator = struct {
+        pos: rl.Vector2,
+        topLeft: rl.Vector2,
+        col: u16,
+        idx: usize,
+        blk: *TileBlock,
+
+        pub fn next(self: *TileIterator, tm: *TileMap, pos: *rl.Vector2) ?TileIdx {
+            if (self.idx < self.blk.tiles.len) {
+               pos.* = self.pos;
+               const rv = self.blk.tiles[self.idx];
+
+                self.idx += 1;
+                self.col += 1;
+                if (self.col == self.blk.width) {
+                    self.col = 0;
+                    self.pos.x = self.topLeft.x;
+                    self.pos.y += tm.gridHeight;
+                } else {
+                    self.pos.x += tm.gridWidth;
+                }
+
+                return rv;
+            } else {
+                return null;
+            }
+        }
+    };
+
+    pub fn iterator(self: *TileBlock, topLeft: rl.Vector2) TileIterator {
+        return TileIterator{
+            .pos = topLeft,
+            .topLeft = topLeft,
+            .col = 0,
+            .idx = 0,
+            .blk = self,
+        };
     }
 };
 
@@ -136,6 +191,8 @@ const TileMap = struct {
             rl.DrawTexturePro(self.txt, self.rects[img_index], destRect,
                               rl.Vector2{ .x = self.gridWidth * spec.center.x, .y = self.gridHeight * spec.center.y },
                               spec.rotation, spec.tint);
+        } else {
+            panic("Index {} out of range: 0..{}", .{img_index, self.rects.len-1});
         }
     }
 
@@ -157,11 +214,11 @@ const TileMap = struct {
         const ny = tht / gridHeight;
         var rects = try al.alloc(rl.Rectangle, nx * ny);
 
-        var x: u16 = 0;
         var y: u16 = 0;
         var idx: usize = 0;
 
         while (y < ny) : (y += 1) {
+            var x: u16 = 0;
             while (x < nx) : (x += 1) {
                 rects[idx] = rl.Rectangle{
                     .x = @intToFloat(f32, x * gridWidth),
