@@ -12,12 +12,14 @@ const WHITE = rl.Color{ .r = 255, .g = 255, .b = 255, .a = 255 };
 const Resources = struct {
     dfont: rl.Font,
     bgmap: TileMap,
+    cam: rl.Camera2D,
 
     pub fn deinit(self: *Resources) void {
         rl.UnloadFont(self.dfont);
         self.bgmap.deinit();
     }
 };
+
 
 pub fn main() !void {
     rl.InitWindow(WinWidth, WinHeight, "Outta Luck");
@@ -27,6 +29,12 @@ pub fn main() !void {
     var res = Resources{
         .dfont = rl.LoadFont("fonty.ttf"),
         .bgmap = try TileMap.init(heap.c_allocator, rl.LoadTexture("resources/platformertiles.png"), 32, 32),
+        .cam = .{
+            .offset = .{.x = WinWidth * 0.5, .y = WinHeight * 0.5},
+            .target = .{.x = 400, .y = 400},
+            .rotation = 0,
+            .zoom = 1,
+        },
     };
     defer res.deinit();
 
@@ -36,17 +44,25 @@ pub fn main() !void {
 
 fn gameLoop(res: *Resources) void {
     //DEBUGGERY
-    const ts = [_]u8 {1, 2, 2, 1};
+    const ts = [_]u8 {1, 1, 1, 2};
     var fs = FloorSection.init(ts[0..], .{.x = 10, .y = 10});  //testes
+    var xs = FloorSection.init(ts[0..], .{.x = 10, .y = 10});  //testes
 
     while (!rl.WindowShouldClose()) {
+        const dT = rl.GetFrameTime();
+        const speed: f32 = 80;
+
+        if (rl.IsKeyDown(rl.KEY_A)) res.cam.target.x -= dT * speed;
+        if (rl.IsKeyDown(rl.KEY_D)) res.cam.target.x += dT * speed;
+        if (rl.IsKeyDown(rl.KEY_W)) res.cam.target.y -= dT * speed;
+        if (rl.IsKeyDown(rl.KEY_S)) res.cam.target.y += dT * speed;
+
         rl.BeginDrawing();
+        rl.BeginMode2D(res.cam);
         rl.ClearBackground(.{ .r = 0, .g = 0, .b = 255, .a = 255 });
-        fs.draw(&res.bgmap, WHITE);
-//      var idx: usize = 0;
-//      while (idx < 10) : (idx += 1) {
-//          res.bgmap.draw(idx, @intToFloat(f32, idx) * 32 * 3, 200, .{ .scale = 3 });
-//      }
+        xs.draw(&res.bgmap, .{.r = 100, .g = 100, .b = 100, .a = 255}, 0.5, res.cam.target);
+        fs.draw(&res.bgmap, WHITE, 1.0, res.cam.target);
+        rl.EndMode2D();
         rl.DrawTextEx(res.dfont, "Eat more cheese 0", .{ .x = 100, .y = 100 }, 30, 6.0, WHITE);
         rl.DrawFPS(10, 10);
         rl.EndDrawing();
@@ -70,18 +86,26 @@ const FloorSection = struct {
         return .{.tiles = tiles, .topLeft = pos };
     }
 
-    pub fn draw(self: *FloorSection, tm: *TileMap, tint: rl.Color) void {
+    pub fn draw(self: *FloorSection, tm: *TileMap, tint: rl.Color, scale: f32, ppos: rl.Vector2) void {
         const spec = TileMap.ImgSpec{.tint = tint};
         var i: usize = 0;
-        var x = self.topLeft.x * tm.gridWidth;
-        const y = self.topLeft.y * tm.gridHeight;
+        const tl = rl.Vector2{.x = self.topLeft.x * tm.gridWidth, .y = self.topLeft.y * tm.gridHeight};
+        var cpos = scaleAroundOrigin(tl, scale, ppos);
 
         while (i < self.tiles.len) : (i += 1) {
-            tm.draw(self.tiles[i], x, y, spec);
-            x += tm.gridWidth;
+            tm.draw(self.tiles[i], cpos.x, cpos.y, spec);
+            cpos.x += tm.gridWidth;
         }
     }
 };
+
+// Scales (x, y) as if `origin` was the origin of the coordinate system.
+fn scaleAroundOrigin(pos: rl.Vector2, scale: f32,  origin: rl.Vector2) rl.Vector2 {
+    const rx = pos.x - origin.x;
+    const ry = pos.y - origin.y;
+
+    return .{.x = rx * scale + origin.x, .y = ry * scale + origin.y};
+}
 
 // Texture with individual tiles of a regular grid.
 const TileMap = struct {
