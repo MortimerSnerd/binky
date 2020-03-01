@@ -36,12 +36,12 @@ const CreatingState = struct {
     topMsgBuf: [256]u8 = [_]u8{0} ** 256,
 
     // Path to png file for tileset.
-    imgPath: []const u8 = "",
+    imgPath: [:0]const u8 = "",
     imgPathBuf: [fs.MAX_PATH_BYTES]u8 = [_]u8{0} ** fs.MAX_PATH_BYTES,
 
     // Base name used to create level and tile block
     // files.
-    baseName: []const u8 = "",
+    baseName: [:0]const u8 = "",
     baseNameBuf: [64]u8 = [_]u8{0} ** 64,
 
     workDir: fs.Dir,
@@ -49,8 +49,8 @@ const CreatingState = struct {
     // Set up our buffers.
     pub fn init(cs: *CreatingState) void {
         cs.topMsg = cs.topMsgBuf[0..0:0];
-        cs.imgPath = cs.imgPathBuf[0..0];
-        cs.baseName = cs.baseNameBuf[0..0];
+        cs.imgPath = cs.imgPathBuf[0..0:0];
+        cs.baseName = cs.baseNameBuf[0..0:0];
     }
 };
 
@@ -134,7 +134,7 @@ fn handleCreatingNew(dT: f32)  FrameResponse {
         const defpath = "resources/";
         mem.copy(u8, cr.imgPathBuf[0..], defpath);
         cr.imgPathBuf[defpath.len] = 0; // Must terminate, because passing to C fn.
-        cr.imgPath = cr.imgPathBuf[0..defpath.len];
+        cr.imgPath = cr.imgPathBuf[0..defpath.len:0];
     }
 
     rl.BeginDrawing();
