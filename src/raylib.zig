@@ -2621,7 +2621,7 @@ pub const DARKPURPLE = @compileError("unable to translate C expr: unexpected tok
 pub const BEIGE = @compileError("unable to translate C expr: unexpected token Id{ .LBrace = void }");
 pub const BROWN = @compileError("unable to translate C expr: unexpected token Id{ .LBrace = void }");
 pub const DARKBROWN = @compileError("unable to translate C expr: unexpected token Id{ .LBrace = void }");
-pub const WHITE = @compileError("unable to translate C expr: unexpected token Id{ .LBrace = void }");
+pub const WHITE = Color{.r = 255, .g = 255, .b = 255, .a = 255};
 pub const BLACK = @compileError("unable to translate C expr: unexpected token Id{ .LBrace = void }");
 pub const BLANK = @compileError("unable to translate C expr: unexpected token Id{ .LBrace = void }");
 pub const MAGENTA = @compileError("unable to translate C expr: unexpected token Id{ .LBrace = void }");
