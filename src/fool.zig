@@ -78,15 +78,17 @@ fn gameLoop(gs: *GameState) void {
 
     defer switchState(&curstate, .Running, gs);
 
-    rl.GuiFont(gs.res.dfont);
+    //rl.GuiFont(gs.res.dfont);
 
     while (!rl.WindowShouldClose()) {
         const dT = rl.GetFrameTime();
 
-        if (rl.IsKeyPressed(rl.KEY_ZERO)) switchState(&curstate, .Editing, gs);
 
         switch (curstate) {
-            .Running => onePass(gs, dT, &lay),
+            .Running => {
+                onePass(gs, dT, &lay);
+                if (rl.IsKeyPressed(rl.KEY_ZERO)) switchState(&curstate, .Editing, gs);
+            },
             .Editing => _ = switch (editor.handleFrame(dT)) {
                 .Finished => switchState(&curstate, .Running, gs),
                 .Running => {},
@@ -129,6 +131,12 @@ fn switchState(cur: *LoopState, new: LoopState, gs: *GameState) void {
             .Running => editor.deinit(),
             .Editing => {},
         },
+    }
+
+    if (cur.* != new) {
+        // Clear out any pressed keys in the queue - we don't want presses to carry over
+        // from switching states.
+        while (rl.GetKeyPressed() > 0) {}
     }
 
     cur.* = new;
