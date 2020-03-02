@@ -63,7 +63,7 @@ pub fn main() !void {
 
     rl.SetTargetFPS(60);
 
-    gameLoop(&gs);
+    try gameLoop(&gs);
 }
 
 const LoopState = enum {
@@ -71,12 +71,12 @@ const LoopState = enum {
     Editing,
 };
 
-fn gameLoop(gs: *GameState) void {
+fn gameLoop(gs: *GameState) !void {
     //DEBUGGERY
     var lay = tile.Layer.init(rsrc.Dirt.BlockDefs[0..], 1.0);
     var curstate: LoopState = .Running;
 
-    defer switchState(&curstate, .Running, gs);
+    defer switchState(&curstate, .Running, gs) catch {};
 
     //rl.GuiFont(gs.res.dfont);
 
@@ -87,29 +87,29 @@ fn gameLoop(gs: *GameState) void {
         switch (curstate) {
             .Running => {
                 onePass(gs, dT, &lay);
-                if (rl.IsKeyPressed(rl.KEY_ZERO)) switchState(&curstate, .Editing, gs);
+                if (rl.IsKeyPressed(rl.KEY_ZERO)) try switchState(&curstate, .Editing, gs);
             },
-            .Editing => _ = switch (editor.handleFrame(dT)) {
-                .Finished => switchState(&curstate, .Running, gs),
+            .Editing => _ = switch (try editor.handleFrame(dT)) {
+                .Finished => try switchState(&curstate, .Running, gs),
                 .Running => {},
                 .CreateCancelled => {
                     // Throw out level data, it's not valid.
                     gs.level = null;
-                    switchState(&curstate, .Running, gs);
+                    try switchState(&curstate, .Running, gs);
                 },
             },
         }
     }
 }
 
-fn switchState(cur: *LoopState, new: LoopState, gs: *GameState) void {
+fn switchState(cur: *LoopState, new: LoopState, gs: *GameState) !void {
     switch (cur.*) {
         .Running => {
             switch (new) {
                 .Running => {},
                 .Editing => {
                     if (gs.level) |*lv| {
-                        editor.init(gs.al, &lv.tset, &lv.layer1);
+                        try editor.init(gs.al, &lv.tset, &lv.layer1);
                     } else {
                         // Slightly hinky, but we set up an undefined
                         // level for the editor to deal with.  It will return
@@ -120,7 +120,7 @@ fn switchState(cur: *LoopState, new: LoopState, gs: *GameState) void {
                             .layer1 = undefined,
                         };
                         if (gs.level) |*lv| {
-                            editor.mkNew(gs.al, &lv.tset, &lv.layer1);
+                            try editor.mkNew(gs.al, &lv.tset, &lv.layer1);
                         }
                     }
                 },

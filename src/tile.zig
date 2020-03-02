@@ -8,10 +8,14 @@ const panic = std.debug.panic;
 const maxInt = std.math.maxInt;
 
 pub const Layer = struct {
-    // Unowned slice of tile blocks.
+    // Unowned slice of tile blocks.  The blockDefs are likely shared
+    // between multiple layers, so an externally managed array will
+    // have all of the blocks, and this will be a slice into that array.
     blockDefs: []const Block,
 
-    // Owned slice of block instances.
+    // Owned slice of block instances.  No reason for these
+    // to be shared between multiple layers, so we own this
+    // allocation.
     blocks: []const BlockInst,
 
     // 1.0 for layer player is on, <1 for layers behind.  Must be > 0.
@@ -22,6 +26,19 @@ pub const Layer = struct {
         pos: rl.Vector2,
     };
 
+    // Force the layer to use `newBuffer` as the memory
+    // for `blockDefs`.  Used by the editor when it needs
+    // to control the def memory. Returns the number of blocks
+    // used.
+    pub fn useBlockDefBuffer(self: *Layer, newBuffer: []Block) !usize {
+        warn("DEBUG nb {}, bd {}\n", .{newBuffer.len, self.blockDefs.len});
+        if (newBuffer.len < self.blockDefs.len) return error.BufferTooSmall;
+        const blen = self.blockDefs.len;
+        mem.copy(Block, newBuffer, self.blockDefs);
+        self.blockDefs = newBuffer[0..blen];
+        return blen;
+    }
+
     pub fn draw(self: *Layer, tm: *Set, playerPos: rl.Vector2) void {
         const ds = Block.DrawSpec{.scaleOrigin = playerPos};
 
@@ -31,14 +48,9 @@ pub const Layer = struct {
     }
 
     pub fn init(blockDefs: []const Block, depthScale: f32) Layer {
-        const testBlocks = [_]BlockInst {
-                .{.block = 1, .pos = .{.x = 100, .y = 150}},
-                .{.block = 2, .pos = .{.x = 232, .y = 200}}
-            };
-
         return Layer{
             .blockDefs = blockDefs,
-            .blocks = testBlocks[0..],
+            .blocks = &[0]BlockInst{},
             .depthScale = depthScale,
         };
     }
@@ -48,13 +60,29 @@ pub const Layer = struct {
     }
 };
 
+need to rethink the memory ownership here.
+
 pub const TileIdx = u8;
 pub const Block = struct {
-    // Unowned slice of tile indexes.
+    // Unowned slice of tile indexes.  Rather than having
+    // a separate allocation for each block, instead there
+    // will one array of TileIdx built up during loading, and
+    // blocks will have slices into it.
     tiles: []const TileIdx,
 
     // Width of the block of tiles.
     width: u16,
+
+    // Forces the block to use newBuf as the memory for
+    // `tiles`.  Used by the editor when it need to control
+    // the memory.  Returns the number newBuf items used.
+    pub fn useTileBuffer(self: *Block, newBuf: []TileIdx) !usize {
+        if (newBuf.len < self.tiles.len) return error.BufferTooSmall;
+        const tlen = self.tiles.len;
+        mem.copy(TileIdx, newBuf, self.tiles);
+        self.tiles = newBuf[0..tlen];
+        return tlen;
+    }
 
     pub fn init(tiles: []const TileIdx, width: usize, height: usize) !Block {
         if (tiles.len > maxInt(u16) or width > maxInt(u16) or height > maxInt(u16)) return error.Overflow;
