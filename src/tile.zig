@@ -1,6 +1,7 @@
 const std = @import("std");
 
 const fs = std.fs;
+const heap = std.heap;
 const mem = std.mem;
 const rl = @import("raylib.zig");
 const warn = std.debug.warn;
@@ -59,8 +60,6 @@ pub const Layer = struct {
         // eventually free blockinst data we read from a file or something
     }
 };
-
-need to rethink the memory ownership here.
 
 pub const TileIdx = u8;
 pub const Block = struct {
@@ -273,3 +272,97 @@ pub const Set = struct {
         tm.al.free(tm.rects);
     }
 };
+
+// All of the pieces for a level.  Loads levels,
+// and manages memory for the components that don't
+// own their slices, either because the memory is shared
+// among several pieces, or to avoid lots of tiny allocations
+// in favor of many slices into a big array.
+pub const Level = struct {
+    al: *mem.Allocator,
+
+    // Allocator used to allocate memory during editing.
+    // The expectation is that editor will save the level out
+    // into a format of know arrays, that doesn't require
+    // the piecemeal allocations here.
+    arena: heap.ArenaAllocator,
+
+    // Path to the level file this was read from, or to
+    // the file it could be saved to. Owned.
+    srcFile: []const u8,
+
+    // Path to the image file for the tilemap.  Owned.
+    imgFile: [:0]const u8,
+
+    // One tileset for all of the levels needs ATM.
+    tset: Set,
+
+    // Just a single one for now, there will be more later.
+    layers: [1]Layer,
+
+    // Backing memory for tile blocks, used by `layers`.
+    // If this level has been loaded from a file, then this
+    // will be an exactly sized allocation that contains all of the
+    // blocks.  In the case where the editor is adding blocks, they
+    // will be allocated by `arena`.  It will be up to the level saving
+    // code to merge the mix of two memory areas into a single array for
+    // later loads.
+    layerBlocks: ?[]Block,
+
+    // Block tile array.  For a loaded level, contains all of the
+    // tile sequences, referenced by slices in the Block definitions.
+    // While editing, some blocks may have slices into memory allocated
+    // by `arena`.
+    blockTiles: ?[]TileIdx,
+
+    // Called by the editor to create a new empty level.  `srcFile`
+    // must be a valid path for the level file this would be saved to,
+    // but the file doesn't need to exist.  imgFile should point to an
+    // existing tilemap image.
+    //
+    // Takes ownership of `srcFile` and `imgFile`.
+    pub fn initEmpty(al: *mem.Allocator, srcFile: []const u8, imgFile: [:0]const u8,
+        gridDim: u16) !Level {
+        if (srcFile.len == 0) return error.BadFileName;
+
+        var noBlocks:[0]Block = undefined;
+        var noTiles:[0]TileIdx = undefined;
+
+        return Level{
+            .al = al,
+            .arena = heap.ArenaAllocator.init(al),
+            .srcFile = srcFile,
+            .imgFile = imgFile,
+            .tset = try Set.init(al, rl.LoadTexture(imgFile), gridDim, gridDim),
+            .layers = [_]Layer{
+                Layer.init(noBlocks[0..0], 1)
+            },
+            .layerBlocks = null,
+            .blockTiles = null,
+        };
+    }
+
+    // Returns an undefined level structure.
+    pub fn undefLevel() Level {
+        var rv: Level = undefined;
+
+        return rv;
+    }
+
+    pub fn deinit(lv: *Level) void {
+        if (lv.layerBlocks) |lb| {
+            lv.al.free(lb);
+            lv.layerBlocks = null;
+        }
+
+        if (lv.blockTiles) |bt| {
+            lv.al.free(bt);
+            lv.blockTiles = null;
+        }
+
+        lv.al.free(lv.srcFile);
+        lv.al.free(lv.imgFile);
+        lv.arena.deinit();
+    }
+};
+

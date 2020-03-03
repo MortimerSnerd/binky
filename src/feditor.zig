@@ -15,31 +15,13 @@ const State = struct {
 
     state: StateName,
 
-    // Unowned pointers to the level data
+    // Unowned pointer to the level data
     // we're working on.
-    tset: *tile.Set,
-    layer1: *tile.Layer,
-
-    // tile.Block and tile.Layer have unowned slices of objects,
-    // mostly for things that can be shared between multiple instances, or
-    // to avoid doing several small allocations.  When we're editing these, we need to create
-    // and own this memory instead.  So we have buffers here we can add and
-    // modify, and the Layer and Blocks just see slices into this.
-    //
-    // Another consequence of this is when we are finished with an edit,
-    // we need to save to a file, and reload from the file so the returned
-    // level data doesn't reference our backing buffers, which will go away
-    // when editing ends.
-    layerBlocks: []tile.Block,
-    layerBlocksUsed: usize,
-    blockTiles: []tile.TileIdx,
-    blockTilesUsed: usize,
+    level: *tile.Level,
 
     create: CreatingState,
 
     pub fn deinit(st: *State) void {
-        st.al.free(st.layerBlocks);
-        st.al.free(st.blockTiles);
     }
 
     const StateName = enum {
@@ -88,12 +70,7 @@ fn undefInit() State {
    return State{
         .al = heap.c_allocator,
         .state = .InitialInvalid,
-        .tset = @intToPtr(*tile.Set, 0x1000),
-        .layer1 = @intToPtr(*tile.Layer, 0x1000),
-        .layerBlocks = @intToPtr([*]tile.Block, 0x1000)[0..0],
-        .layerBlocksUsed = 0,
-        .blockTiles = @intToPtr([*]tile.TileIdx, 0x1000)[0..0],
-        .blockTilesUsed = 0,
+        .level = @intToPtr(*tile.Level, 0x1000),
         .create = CreatingState{
             .workDir = fs.cwd(),
         },
@@ -101,38 +78,22 @@ fn undefInit() State {
 }
 
 
-fn init0(al: *mem.Allocator, tset: *tile.Set, layer1: *tile.Layer, start: State.StateName) !void {
+fn init0(al: *mem.Allocator, level: *tile.Level, start: State.StateName) void {
     GState = State{
         .al = al,
         .state = start,
-        .tset = tset,
-        .layer1 = layer1,
-        .layerBlocks = try al.alloc(tile.Block, 300),
-        .layerBlocksUsed = 0,
-        .blockTiles = try al.alloc(tile.TileIdx, 500),
-        .blockTilesUsed = 0,
+        .level = level,
         .create = CreatingState{
             .workDir = fs.cwd(),
         },
     };
     GState.create.init();
-
-    if (start == .Editing) {
-        // We control the memory of layers, blocks while editing.
-        GState.layerBlocksUsed = try GState.layer1.useBlockDefBuffer(GState.layerBlocks);
-        var tilesUsed: usize = 0;
-        for (GState.layerBlocks[0..GState.layerBlocksUsed]) |*bd| {
-            tilesUsed += try bd.useTileBuffer(GState.blockTiles[tilesUsed..]);
-        }
-        GState.blockTilesUsed = tilesUsed;
-        warn("Owned buffer usage, blocks = {}, tiles = {}\n", .{GState.layerBlocksUsed, tilesUsed});
-    }
 }
 
 // Must be called before calling any other
 // functions.  Call deinit() when done.
-pub fn init(al: *mem.Allocator, tset: *tile.Set, layer1: *tile.Layer) !void {
-    return init0(al, tset, layer1, .Editing);
+pub fn init(al: *mem.Allocator, level: *tile.Level) void {
+    return init0(al, level, .Editing);
 }
 
 // Should be called to have the editor create a new level.
@@ -141,8 +102,8 @@ pub fn init(al: *mem.Allocator, tset: *tile.Set, layer1: *tile.Layer) !void {
 // can not initialize the level data, handleFrame will return
 // CreateCancelled, so the caller will know to throw out the level
 // data without attempting to use or deinit() it.
-pub fn mkNew(al: *mem.Allocator, tset: *tile.Set, layer1: *tile.Layer) !void {
-    return init0(al, tset, layer1, .CreatingNew);
+pub fn mkNew(al: *mem.Allocator, level: *tile.Level) void {
+    return init0(al, level, .CreatingNew);
 }
 
 pub fn deinit() void {
@@ -304,11 +265,11 @@ fn blockFileName(buf: []u8, basename: []const u8) ![]const u8 {
 // Creates a blank level based on the information in
 // GState.create.
 fn createLvl() !void {
-    var txt = rl.LoadTexture(GState.create.imgPath);
-    const gd = GState.create.gridDim;
+    var buf: [fs.MAX_PATH_BYTES]u8 = undefined;
+    const bname = try blockFileName(buf[0..], GState.create.baseName);
+    const srcFile = try mem.dupe(GState.al, u8, bname);
+    const imgFile = try mem.dupeZ(GState.al, u8, GState.create.imgPath);
 
-    GState.tset.* = try tile.Set.init(GState.al, txt, GState.create.gridDim, GState.create.gridDim);
-    GState.layer1.* = tile.Layer.init(GState.layerBlocks[0..0], 1);
-    GState.layerBlocksUsed = try GState.layer1.useBlockDefBuffer(GState.layerBlocks);
+    GState.level.* = try tile.Level.initEmpty(GState.al, srcFile, imgFile, GState.create.gridDim);
 }
 

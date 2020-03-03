@@ -30,14 +30,9 @@ const Resources = struct {
 
 const GameState = struct {
     al: *mem.Allocator,
-    level: ?LevelInfo,
+    level: ?tile.Level,
     res: Resources,
     cam: rl.Camera2D,
-
-    const LevelInfo = struct {
-        tset: tile.Set,
-        layer1: tile.Layer,
-    };
 };
 
 pub fn main() !void {
@@ -73,10 +68,9 @@ const LoopState = enum {
 
 fn gameLoop(gs: *GameState) !void {
     //DEBUGGERY
-    var lay = tile.Layer.init(rsrc.Dirt.BlockDefs[0..], 1.0);
     var curstate: LoopState = .Running;
 
-    defer switchState(&curstate, .Running, gs) catch {};
+    defer switchState(&curstate, .Running, gs);
 
     //rl.GuiFont(gs.res.dfont);
 
@@ -86,41 +80,40 @@ fn gameLoop(gs: *GameState) !void {
 
         switch (curstate) {
             .Running => {
-                onePass(gs, dT, &lay);
-                if (rl.IsKeyPressed(rl.KEY_ZERO)) try switchState(&curstate, .Editing, gs);
+                onePass(gs, dT);
+                if (rl.IsKeyPressed(rl.KEY_ZERO)) switchState(&curstate, .Editing, gs);
             },
             .Editing => _ = switch (try editor.handleFrame(dT)) {
-                .Finished => try switchState(&curstate, .Running, gs),
+                .Finished => switchState(&curstate, .Running, gs),
                 .Running => {},
                 .CreateCancelled => {
                     // Throw out level data, it's not valid.
                     gs.level = null;
-                    try switchState(&curstate, .Running, gs);
+                    switchState(&curstate, .Running, gs);
                 },
             },
         }
     }
 }
 
-fn switchState(cur: *LoopState, new: LoopState, gs: *GameState) !void {
+fn switchState(cur: *LoopState, new: LoopState, gs: *GameState) void {
     switch (cur.*) {
         .Running => {
             switch (new) {
                 .Running => {},
                 .Editing => {
                     if (gs.level) |*lv| {
-                        try editor.init(gs.al, &lv.tset, &lv.layer1);
+                        editor.init(gs.al, lv);
                     } else {
                         // Slightly hinky, but we set up an undefined
                         // level for the editor to deal with.  It will return
                         // an indication to us if the level hasn't been
                         // initialized, so we can re-null it for that case.
-                        gs.level = .{
-                            .tset = undefined,
-                            .layer1 = undefined,
-                        };
+                        // TODO: this is ugly.  But it's a end result of needing
+                        //   some verified information that the editor prompts for.
+                        gs.level = tile.Level.undefLevel();
                         if (gs.level) |*lv| {
-                            try editor.mkNew(gs.al, &lv.tset, &lv.layer1);
+                            editor.mkNew(gs.al, lv);
                         }
                     }
                 },
@@ -143,7 +136,7 @@ fn switchState(cur: *LoopState, new: LoopState, gs: *GameState) !void {
 }
 
 
-fn onePass(gs: *GameState, dT: f32, lay: *tile.Layer) void {
+fn onePass(gs: *GameState, dT: f32) void {
     const speed: f32 = 80;
 
     if (rl.IsKeyDown(rl.KEY_A)) gs.cam.target.x -= dT * speed;
@@ -155,7 +148,9 @@ fn onePass(gs: *GameState, dT: f32, lay: *tile.Layer) void {
     rl.BeginMode2D(gs.cam);
     rl.ClearBackground(.{ .r = 0, .g = 0, .b = 255, .a = 255 });
     if (gs.level) |*lv| {
-        lv.layer1.draw(&lv.tset, gs.cam.target);
+        for (lv.layers) |*lay| {
+            lay.draw(&lv.tset, gs.cam.target);
+        }
     }
     rl.EndMode2D();
     rl.DrawTextEx(gs.res.dfont, "Eat more cheese 0", .{ .x = 100, .y = 100 }, 30, 6.0, WHITE);
