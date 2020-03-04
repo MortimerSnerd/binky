@@ -13,6 +13,9 @@ const warn = std.debug.warn;
 const State = struct {
     al: *mem.Allocator,
 
+    // Used to editor allocations for the level
+    arena: heap.ArenaAllocator,
+
     state: StateName,
 
     // Unowned pointer to the level data
@@ -22,6 +25,7 @@ const State = struct {
     create: CreatingState,
 
     pub fn deinit(st: *State) void {
+        st.arena.deinit();
     }
 
     const StateName = enum {
@@ -69,6 +73,7 @@ var GState: State = undefInit();
 fn undefInit() State {
    return State{
         .al = heap.c_allocator,
+        .arena = undefined,
         .state = .InitialInvalid,
         .level = @intToPtr(*tile.Level, 0x1000),
         .create = CreatingState{
@@ -81,6 +86,7 @@ fn undefInit() State {
 fn init0(al: *mem.Allocator, level: *tile.Level, start: State.StateName) void {
     GState = State{
         .al = al,
+        .arena = heap.ArenaAllocator.init(al),
         .state = start,
         .level = level,
         .create = CreatingState{
@@ -270,6 +276,6 @@ fn createLvl() !void {
     const srcFile = try mem.dupe(GState.al, u8, bname);
     const imgFile = try mem.dupeZ(GState.al, u8, GState.create.imgPath);
 
-    GState.level.* = try tile.Level.initEmpty(GState.al, srcFile, imgFile, GState.create.gridDim);
+    GState.level.* = try tile.Level.initEmpty(GState.al, &GState.arena.allocator, srcFile, imgFile, GState.create.gridDim);
 }
 

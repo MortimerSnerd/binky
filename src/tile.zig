@@ -27,19 +27,6 @@ pub const Layer = struct {
         pos: rl.Vector2,
     };
 
-    // Force the layer to use `newBuffer` as the memory
-    // for `blockDefs`.  Used by the editor when it needs
-    // to control the def memory. Returns the number of blocks
-    // used.
-    pub fn useBlockDefBuffer(self: *Layer, newBuffer: []Block) !usize {
-        warn("DEBUG nb {}, bd {}\n", .{newBuffer.len, self.blockDefs.len});
-        if (newBuffer.len < self.blockDefs.len) return error.BufferTooSmall;
-        const blen = self.blockDefs.len;
-        mem.copy(Block, newBuffer, self.blockDefs);
-        self.blockDefs = newBuffer[0..blen];
-        return blen;
-    }
-
     pub fn draw(self: *Layer, tm: *Set, playerPos: rl.Vector2) void {
         const ds = Block.DrawSpec{.scaleOrigin = playerPos};
 
@@ -71,17 +58,6 @@ pub const Block = struct {
 
     // Width of the block of tiles.
     width: u16,
-
-    // Forces the block to use newBuf as the memory for
-    // `tiles`.  Used by the editor when it need to control
-    // the memory.  Returns the number newBuf items used.
-    pub fn useTileBuffer(self: *Block, newBuf: []TileIdx) !usize {
-        if (newBuf.len < self.tiles.len) return error.BufferTooSmall;
-        const tlen = self.tiles.len;
-        mem.copy(TileIdx, newBuf, self.tiles);
-        self.tiles = newBuf[0..tlen];
-        return tlen;
-    }
 
     pub fn init(tiles: []const TileIdx, width: usize, height: usize) !Block {
         if (tiles.len > maxInt(u16) or width > maxInt(u16) or height > maxInt(u16)) return error.Overflow;
@@ -285,7 +261,7 @@ pub const Level = struct {
     // The expectation is that editor will save the level out
     // into a format of know arrays, that doesn't require
     // the piecemeal allocations here.
-    arena: heap.ArenaAllocator,
+    arena: *mem.Allocator,
 
     // Path to the level file this was read from, or to
     // the file it could be saved to. Owned.
@@ -315,13 +291,21 @@ pub const Level = struct {
     // by `arena`.
     blockTiles: ?[]TileIdx,
 
+    // When editing, these will contain the ArrayLists that back the Layer
+    // blockDefs.  Uses the arena allocator.
+    editLayerBacking: [1]std.ArrayList(Block),
+
+    // When editing, this contains backs the Block.tiles for new/changed
+    // blocks.  Uses the arena allocator.
+    editTileBacking: std.ArrayList(TileIdx),
+
     // Called by the editor to create a new empty level.  `srcFile`
     // must be a valid path for the level file this would be saved to,
     // but the file doesn't need to exist.  imgFile should point to an
     // existing tilemap image.
     //
     // Takes ownership of `srcFile` and `imgFile`.
-    pub fn initEmpty(al: *mem.Allocator, srcFile: []const u8, imgFile: [:0]const u8,
+    pub fn initEmpty(al: *mem.Allocator, arena: *mem.Allocator, srcFile: []const u8, imgFile: [:0]const u8,
         gridDim: u16) !Level {
         if (srcFile.len == 0) return error.BadFileName;
 
@@ -330,16 +314,21 @@ pub const Level = struct {
 
         return Level{
             .al = al,
-            .arena = heap.ArenaAllocator.init(al),
+            .arena = arena,
             .srcFile = srcFile,
             .imgFile = imgFile,
             .tset = try Set.init(al, rl.LoadTexture(imgFile), gridDim, gridDim),
             .layers = [_]Layer{
                 Layer.init(noBlocks[0..0], 1)
             },
+            .editLayerBacking = .{
+                std.ArrayList(Block).init(arena),
+            },
+            .editTileBacking = std.ArrayList(TileIdx).init(arena),
             .layerBlocks = null,
             .blockTiles = null,
         };
+
     }
 
     // Returns an undefined level structure.
