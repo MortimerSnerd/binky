@@ -49,6 +49,8 @@ pub const Layer = struct {
 };
 
 pub const TileIdx = u8;
+pub const EmptyTile: TileIdx = maxInt(TileIdx);
+
 pub const Block = struct {
     // Unowned slice of tile indexes.  Rather than having
     // a separate allocation for each block, instead there
@@ -87,6 +89,7 @@ pub const Block = struct {
         var pos: rl.Vector2 = undefined;
 
         while (iter.next(tm, &pos)) |img| {
+            if (img == EmptyTile) continue;
             tm.draw(img, pos.x, pos.y, tmspec);
         }
     }
