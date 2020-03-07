@@ -10,6 +10,9 @@ const heap = std.heap;
 const mem = std.mem;
 const warn = std.debug.warn;
 
+// Largest block can be MaxBlockDim x MaxBlockDim
+pub const MaxBlockDim = 16;
+
 const State = struct {
     al: *mem.Allocator,
 
@@ -22,6 +25,16 @@ const State = struct {
     // we're working on.
     level: *tile.Level,
 
+    // When state == EditingBlock, this contains the
+    // tile data.
+    blockTiles: ?[MaxBlockDim*MaxBlockDim] tile.TileIdx,
+
+    // Buffer for status and key help message.
+    statusBuf: [256]u8 = [_]u8{0} ** 256,
+
+    // Slice into a constant string literal, or into `statusBuf`.
+    statusMsg: [:0] const u8,
+
     create: CreatingState,
 
     pub fn deinit(st: *State) void {
@@ -31,6 +44,8 @@ const State = struct {
     const StateName = enum {
         Editing,
         CreatingNew,
+        EditingBlock,
+
         // See GState definition comment, this is an initial workaround state that exists before a call to init0().
         InitialInvalid,
     };
@@ -65,6 +80,13 @@ const CreatingState = struct {
 
 };
 
+// Just a place to put key action functions.
+const Actions = struct {
+    fn cancelCreate(dT: f32) FrameResponse {
+            return .CreateCancelled;
+    }
+};
+
 // Due to https://github.com/ziglang/zig/issues/2622, I can't define a global
 // State here, and initialize it undefined.  So we build out an equally invalid
 // instantiation here manually, which init0 will overwrite.
@@ -74,7 +96,9 @@ fn undefInit() State {
    return State{
         .al = heap.c_allocator,
         .arena = undefined,
+        .blockTiles = null,
         .state = .InitialInvalid,
+        .statusMsg = "",
         .level = @intToPtr(*tile.Level, 0x1000),
         .create = CreatingState{
             .workDir = fs.cwd(),
@@ -87,7 +111,9 @@ fn init0(al: *mem.Allocator, level: *tile.Level, start: State.StateName) void {
     GState = State{
         .al = al,
         .arena = heap.ArenaAllocator.init(al),
+        .blockTiles = null,
         .state = start,
+        .statusMsg = "",
         .level = level,
         .create = CreatingState{
             .workDir = fs.cwd(),
@@ -131,20 +157,27 @@ pub const FrameResponse = enum {
 };
 
 pub fn handleFrame(dT: f32) !FrameResponse {
-    switch (GState.state) {
+    const rv = switch (GState.state) {
         .InitialInvalid => unreachable,
-        .Editing => {
+        .EditingBlock => handleEditingBlock(dT),
+        .Editing => blk: {
             if (rl.IsKeyPressed(rl.KEY_NINE)) return .Finished;
             rl.BeginDrawing();
             rl.ClearBackground(.{.r = 0, .g = 0, .b = 0, .a = 255});
             rl.EndDrawing();
-            return .Running;
+            break :blk .Running;
         },
 
-        .CreatingNew => {
-            return try handleCreatingNew(dT);
+        .CreatingNew => blk: {
+            break :blk try handleCreatingNew(dT);
         },
-    }
+    };
+
+    // Draw status at bottom always.
+    const fsize = 16;
+    updateStatus(&GState);
+    rl.DrawText(GState.statusMsg, 10, rl.GetScreenHeight()-fsize, fsize, .{.r = 255, .g = 255, .b = 255, .a = 255});
+    return rv;
 }
 
 // Updates a slice from the buffer backing the slice after a C call
@@ -158,8 +191,6 @@ fn updateSliceFromCStr(slice: *[] const u8, buf: []u8) void {
 fn handleCreatingNew(dT: f32)  !FrameResponse {
     const cr = &GState.create;
 
-    if (rl.IsKeyPressed(rl.KEY_NINE)) return .CreateCancelled;
-
     if (cr.imgPath.len == 0) {
         const defpath = "resources/";
         mem.copy(u8, cr.imgPathBuf[0..], defpath);
@@ -168,7 +199,7 @@ fn handleCreatingNew(dT: f32)  !FrameResponse {
     }
 
     rl.BeginDrawing();
-    rl.ClearBackground(.{.r = 0, .g = 255, .b = 0, .a = 255});
+    rl.ClearBackground(.{.r = 0, .g = 0, .b = 0, .a = 255});
 
     // Draw the UI
     const fntSz:f32 = 16;
@@ -229,7 +260,8 @@ fn handleCreatingNew(dT: f32)  !FrameResponse {
 
     if (cr.topMsg.len == 0 and ok) {
         try createLvl();
-        return .Finished;
+        switchState(&GState, .Editing);
+        return .Running;
     }
 
     if (canceled) {
@@ -277,5 +309,73 @@ fn createLvl() !void {
     const imgFile = try mem.dupeZ(GState.al, u8, GState.create.imgPath);
 
     GState.level.* = try tile.Level.initEmpty(GState.al, &GState.arena.allocator, srcFile, imgFile, GState.create.gridDim);
+}
+
+fn switchState(st: *State, newState: State.StateName) void {
+    switch (st.state) {
+        .Editing => switch (newState) {
+            .Editing => return,
+            .CreatingNew => unreachable,
+            .EditingBlock => {
+                // Clear the tiles we show in the editor.
+                st.blockTiles = [_]tile.TileIdx{tile.EmptyTile} ** (MaxBlockDim * MaxBlockDim);
+                st.state = newState;
+            },
+            .InitialInvalid => unreachable,
+        },
+
+        .CreatingNew => switch (newState) {
+            .Editing => {
+                // Level is initialized, nothing to see here.
+                st.state = newState;
+            },
+            .CreatingNew => return,
+            .EditingBlock => unreachable,
+            .InitialInvalid => unreachable,
+        },
+
+        .EditingBlock => switch(newState) {
+            .Editing => {
+                // do things here to add the block to the level.
+                unreachable;
+            },
+            .CreatingNew => unreachable,
+            .EditingBlock => return,
+            .InitialInvalid => unreachable,
+        },
+
+        .InitialInvalid => unreachable  // state transition handled implicitly by init0()
+    }
+}
+
+fn handleEditingBlock(dT: f32) FrameResponse {
+    return .Running;
+}
+
+fn updateStatus(st: *State) void {
+    const sl = switch (st.state) {
+        .InitialInvalid => "ARRRRGH"[0..],
+
+        .Editing => blk: {
+            const keyhelp = "Escape[Quit]";
+            break :blk fmt.bufPrint(st.statusBuf[0..], "FILE {} {}",
+                                       .{st.level.srcFile, keyhelp}) catch unreachable;
+        },
+
+        .EditingBlock => blk: {
+            const keyhelp= "9[Cancel Edit]";
+            break :blk fmt.bufPrint(st.statusBuf[0..], "BLOCK {} {}",
+                                       .{st.level.srcFile, keyhelp}) catch unreachable;
+        },
+
+        .CreatingNew => blk: {
+            const keyhelp= "9[Cancel Create]";
+            //errr, that is a bad key binding
+            break :blk fmt.bufPrint(st.statusBuf[0..], "NEW {}",
+                                       .{keyhelp}) catch unreachable;
+        },
+    };
+    st.statusMsg = st.statusBuf[0..sl.len:0];
+    st.statusBuf[st.statusMsg.len] = 0;
 }
 

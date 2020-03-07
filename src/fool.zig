@@ -77,7 +77,6 @@ fn gameLoop(gs: *GameState) !void {
     while (!rl.WindowShouldClose()) {
         const dT = rl.GetFrameTime();
 
-
         switch (curstate) {
             .Running => {
                 onePass(gs, dT);
