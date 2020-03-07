@@ -80,13 +80,6 @@ const CreatingState = struct {
 
 };
 
-// Just a place to put key action functions.
-const Actions = struct {
-    fn cancelCreate(dT: f32) FrameResponse {
-            return .CreateCancelled;
-    }
-};
-
 // Due to https://github.com/ziglang/zig/issues/2622, I can't define a global
 // State here, and initialize it undefined.  So we build out an equally invalid
 // instantiation here manually, which init0 will overwrite.
@@ -161,7 +154,7 @@ pub fn handleFrame(dT: f32) !FrameResponse {
         .InitialInvalid => unreachable,
         .EditingBlock => handleEditingBlock(dT),
         .Editing => blk: {
-            if (rl.IsKeyPressed(rl.KEY_NINE)) return .Finished;
+            if (rl.IsKeyPressed(rl.KEY_ESCAPE)) return .Finished;
             rl.BeginDrawing();
             rl.ClearBackground(.{.r = 0, .g = 0, .b = 0, .a = 255});
             rl.EndDrawing();
@@ -174,7 +167,7 @@ pub fn handleFrame(dT: f32) !FrameResponse {
     };
 
     // Draw status at bottom always.
-    const fsize = 16;
+    const fsize = 10;
     updateStatus(&GState);
     rl.DrawText(GState.statusMsg, 10, rl.GetScreenHeight()-fsize, fsize, .{.r = 255, .g = 255, .b = 255, .a = 255});
     return rv;
@@ -191,6 +184,10 @@ fn updateSliceFromCStr(slice: *[] const u8, buf: []u8) void {
 fn handleCreatingNew(dT: f32)  !FrameResponse {
     const cr = &GState.create;
 
+    if (rl.IsKeyPressed(rl.KEY_ESCAPE)) {
+        return .CreateCancelled;
+    }
+
     if (cr.imgPath.len == 0) {
         const defpath = "resources/";
         mem.copy(u8, cr.imgPathBuf[0..], defpath);
@@ -202,7 +199,7 @@ fn handleCreatingNew(dT: f32)  !FrameResponse {
     rl.ClearBackground(.{.r = 0, .g = 0, .b = 0, .a = 255});
 
     // Draw the UI
-    const fntSz:f32 = 16;
+    const fntSz:f32 = 20;
     const vspace:f32 = 4;
     const labwidth:f32 = fntSz * 10;
     const lmargin:f32 = 40;
@@ -349,6 +346,8 @@ fn switchState(st: *State, newState: State.StateName) void {
 }
 
 fn handleEditingBlock(dT: f32) FrameResponse {
+    if (rl.IsKeyPressed(rl.KEY_ESCAPE)) return .CreateCancelled;
+
     return .Running;
 }
 
@@ -357,20 +356,19 @@ fn updateStatus(st: *State) void {
         .InitialInvalid => "ARRRRGH"[0..],
 
         .Editing => blk: {
-            const keyhelp = "Escape[Quit]";
+            const keyhelp = "Escape[Cancel Edit] Ctrl-X[Quit]";
             break :blk fmt.bufPrint(st.statusBuf[0..], "FILE {} {}",
                                        .{st.level.srcFile, keyhelp}) catch unreachable;
         },
 
         .EditingBlock => blk: {
-            const keyhelp= "9[Cancel Edit]";
+            const keyhelp= "Escape[Cancel Edit]";
             break :blk fmt.bufPrint(st.statusBuf[0..], "BLOCK {} {}",
                                        .{st.level.srcFile, keyhelp}) catch unreachable;
         },
 
         .CreatingNew => blk: {
-            const keyhelp= "9[Cancel Create]";
-            //errr, that is a bad key binding
+            const keyhelp= "Escape[Cancel Create]";
             break :blk fmt.bufPrint(st.statusBuf[0..], "NEW {}",
                                        .{keyhelp}) catch unreachable;
         },

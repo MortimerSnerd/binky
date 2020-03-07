@@ -56,6 +56,8 @@ pub fn main() !void {
     };
     defer gs.res.deinit();
 
+    // Free up Escape key so we can use it for bindings.
+    rl.SetExitKey(0);
     rl.SetTargetFPS(60);
 
     try gameLoop(&gs);
@@ -74,13 +76,13 @@ fn gameLoop(gs: *GameState) !void {
 
     //rl.GuiFont(gs.res.dfont);
 
-    while (!rl.WindowShouldClose()) {
+    while (!rl.WindowShouldClose() and !controlPressed(rl.KEY_X)) {
         const dT = rl.GetFrameTime();
 
         switch (curstate) {
             .Running => {
                 onePass(gs, dT);
-                if (rl.IsKeyPressed(rl.KEY_ZERO)) switchState(&curstate, .Editing, gs);
+                if (controlPressed(rl.KEY_N)) switchState(&curstate, .Editing, gs);
             },
             .Editing => _ = switch (try editor.handleFrame(dT)) {
                 .Finished => switchState(&curstate, .Running, gs),
@@ -93,6 +95,10 @@ fn gameLoop(gs: *GameState) !void {
             },
         }
     }
+}
+
+fn controlPressed(key: c_int) bool {
+    return rl.IsKeyDown(rl.KEY_LEFT_CONTROL) and rl.IsKeyPressed(key);
 }
 
 fn switchState(cur: *LoopState, new: LoopState, gs: *GameState) void {
