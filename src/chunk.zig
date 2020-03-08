@@ -2,6 +2,7 @@
 const std = @import("std");
 
 const Allocator = std.mem.Allocator;
+const assert = std.debug.assert;
 const Check = std.hash.Crc32;
 const InStream = std.io.InStream;
 const maxInt = std.math.maxInt;
@@ -23,6 +24,13 @@ const Chunk = packed struct {
 };
 
 
+// Support for writing files made of chunks.
+// Basic flow:
+//    var w = ChunkWriter(..).init(...);
+//    var cs = try w.startChunk(0x12);  // Chunk id 0x12
+//    try cs.write(...);
+//    try cs.write(...);
+//    try w.endChunk(); // Actually flushes the chunk to the underlying stream.
 pub fn ChunkWriter(comptime StreamError: type) type {
     return struct {
         const Self = @This();
@@ -72,6 +80,10 @@ pub fn ChunkWriter(comptime StreamError: type) type {
             return &self.ckOut.stream;
         }
 
+        pub fn startNamedChunk(self: *Self, comptime Names: type, id: Names) !*OutStream(SliceOutStream.Error) {
+            return self.startChunk(@enumToInt(id));
+        }
+
         pub fn endChunk(self: *Self) !void {
             if (!self.chunkStarted) return error.ChunkNotStarted;
             if (self.ckOut.bytes_written > maxInt(u32)) return error.ChunkTooBig;
@@ -85,6 +97,16 @@ pub fn ChunkWriter(comptime StreamError: type) type {
             try self.outs.write(self.dataOut.getWritten());
             self.chunkStarted=false;
         }
+
+        // Writes a counted string that has a max length of 65535 bytes
+        // to `outs`.  `outs` needs to be the stream returned by `startChunk`.
+        pub fn writeString(self: *Self, outs: *OutStream(SliceOutStream.Error), str: []const u8) !void {
+            assert(outs == &self.ckOut.stream);
+            assert(str.len < maxInt(u16));
+            try outs.writeIntNative(u16, @intCast(u16, str.len));
+            try outs.write(str);
+        }
+
     };
 }
 

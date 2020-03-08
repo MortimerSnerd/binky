@@ -372,9 +372,14 @@ pub const Level = struct {
 
         try wr.init(lv.al, &fout.stream);
 
-        var fst = try wr.startChunk(12);
-        try fst.writeIntNative(u32, 999);
+        var fst = try wr.startNamedChunk(ChunkTypes, .LevelHeader);
+        try wr.writeString(fst, lv.srcFile);
+        try wr.writeString(fst, lv.imgFile);
         try wr.endChunk();
     }
 };
 
+
+const ChunkTypes = enum (u16) {
+    LevelHeader,
+};
