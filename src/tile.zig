@@ -184,21 +184,28 @@ pub const Set = struct {
         rotation: f32 = 0,
         scale: f32 = 1,
         center: rl.Vector2 = rl.Vector2{ .x = 0.5, .y = 0.5 },
-        tint: rl.Color = WHITE,
+        tint: rl.Color = rl.WHITE,
     };
 
     // Draw image #`img_index` in the tilemap with `(x, y)` as the top
     // left corner of the image.
     pub fn draw(self: *Set, img_index: usize, x: f32, y: f32, spec: ImgSpec) void {
         if (img_index < self.rects.len) {
+            //Note: the destRect of DrawTexturePro really doesn't work like I'd expect.
+            // It works as if the x, y is the center of the sprite to be copied.
+            // yikes.
+            const dstWid = self.gridWidth * spec.scale;
+            const dstHt = self.gridHeight * spec.scale;
+            const origin = rl.Vector2{.x = dstWid * spec.center.x, .y = dstHt * spec.center.y};
+
             var destRect = rl.Rectangle{
-                .x = x,
-                .y = y,
+                .x = x + origin.x,
+                .y = y + origin.y,
                 .width = self.gridWidth * spec.scale,
                 .height = self.gridHeight * spec.scale,
             };
 
-            rl.DrawTexturePro(self.txt, self.rects[img_index], destRect, rl.Vector2{ .x = self.gridWidth * spec.center.x, .y = self.gridHeight * spec.center.y }, spec.rotation, spec.tint);
+            rl.DrawTexturePro(self.txt, self.rects[img_index], destRect, origin, spec.rotation, spec.tint);
         } else {
             panic("Index {} out of range: 0..{}", .{ img_index, self.rects.len - 1 });
         }
