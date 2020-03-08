@@ -1,4 +1,5 @@
 const std = @import("std");
+const chunk = @import("chunk.zig");
 
 const fs = std.fs;
 const heap = std.heap;
@@ -29,7 +30,6 @@ pub const Layer = struct {
 
     pub fn draw(self: *Layer, tm: *Set, playerPos: rl.Vector2) void {
         const ds = Block.DrawSpec{.scaleOrigin = playerPos};
-
         for (self.blocks) |blk| {
             self.blockDefs[blk.block].draw(tm, blk.pos, ds);
         }
@@ -362,6 +362,19 @@ pub const Level = struct {
         lv.al.free(lv.srcFile);
         lv.al.free(lv.imgFile);
         lv.arena.deinit();
+    }
+
+    // Saves the level to the given file path.
+    pub fn save(lv: *Level) !void {
+        var f = try fs.cwd().createFile(lv.srcFile, .{});
+        var fout = f.outStream();
+        var wr: chunk.ChunkWriter(fs.File.OutStream.Error) = undefined;
+
+        try wr.init(lv.al, &fout.stream);
+
+        var fst = try wr.startChunk(12);
+        try fst.writeIntNative(u32, 999);
+        try wr.endChunk();
     }
 };
 

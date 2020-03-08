@@ -25,16 +25,13 @@ const State = struct {
     // we're working on.
     level: *tile.Level,
 
-    // When state == EditingBlock, this contains the
-    // tile data.
-    blockTiles: ?[MaxBlockDim*MaxBlockDim] tile.TileIdx,
-
     // Buffer for status and key help message.
     statusBuf: [256]u8 = [_]u8{0} ** 256,
 
     // Slice into a constant string literal, or into `statusBuf`.
     statusMsg: [:0] const u8,
 
+    blockEdit: EditingBlockState,
     create: CreatingState,
 
     pub fn deinit(st: *State) void {
@@ -49,6 +46,19 @@ const State = struct {
         // See GState definition comment, this is an initial workaround state that exists before a call to init0().
         InitialInvalid,
     };
+};
+
+const EditingBlockState = struct {
+    // When state == EditingBlock, this contains the
+    // tile data.
+    blockTiles: [MaxBlockDim*MaxBlockDim] tile.TileIdx,
+
+    // True if the block editing state was cancelled, and blockTiles should
+    // not be saved.
+    cancelled: bool,
+
+    // Tile that be painted to a grid on a mouse click.
+    curTile: u8,
 };
 
 const CreatingState = struct {
@@ -89,12 +99,16 @@ fn undefInit() State {
    return State{
         .al = heap.c_allocator,
         .arena = undefined,
-        .blockTiles = null,
         .state = .InitialInvalid,
         .statusMsg = "",
         .level = @intToPtr(*tile.Level, 0x1000),
         .create = CreatingState{
             .workDir = fs.cwd(),
+        },
+        .blockEdit = EditingBlockState{
+            .blockTiles = undefined,
+            .cancelled = false,
+            .curTile = 0,
         },
     };
 }
@@ -104,12 +118,16 @@ fn init0(al: *mem.Allocator, level: *tile.Level, start: State.StateName) void {
     GState = State{
         .al = al,
         .arena = heap.ArenaAllocator.init(al),
-        .blockTiles = null,
         .state = start,
         .statusMsg = "",
         .level = level,
         .create = CreatingState{
             .workDir = fs.cwd(),
+        },
+        .blockEdit = EditingBlockState{
+            .blockTiles = undefined,
+            .cancelled = false,
+            .curTile = 0,
         },
     };
     GState.create.init();
@@ -154,7 +172,16 @@ pub fn handleFrame(dT: f32) !FrameResponse {
         .InitialInvalid => unreachable,
         .EditingBlock => handleEditingBlock(dT),
         .Editing => blk: {
-            if (rl.IsKeyPressed(rl.KEY_ESCAPE)) return .Finished;
+            if (rl.IsKeyPressed(rl.KEY_ESCAPE)) {
+                try GState.level.save();
+                break :blk .Finished;
+            }
+
+            if (controlPressed(rl.KEY_B)) {
+                switchState(&GState, .EditingBlock);
+                break :blk FrameResponse.Running;
+            }
+
             rl.BeginDrawing();
             rl.ClearBackground(.{.r = 0, .g = 0, .b = 0, .a = 255});
             rl.EndDrawing();
@@ -173,10 +200,15 @@ pub fn handleFrame(dT: f32) !FrameResponse {
     return rv;
 }
 
+pub fn controlPressed(key: c_int) bool {
+    return rl.IsKeyDown(rl.KEY_LEFT_CONTROL) and rl.IsKeyPressed(key);
+}
+
+
 // Updates a slice from the buffer backing the slice after a C call
 // may have modfied the null terminated string in the buffer.
 fn updateSliceFromCStr(slice: *[] const u8, buf: []u8) void {
-    const sl = mem.len(u8, @ptrCast([*:0] const u8, &buf[0]));
+    const sl = mem.len(@ptrCast([*:0] const u8, &buf[0]));
 
     slice.* = buf[0..sl];
 }
@@ -315,7 +347,8 @@ fn switchState(st: *State, newState: State.StateName) void {
             .CreatingNew => unreachable,
             .EditingBlock => {
                 // Clear the tiles we show in the editor.
-                st.blockTiles = [_]tile.TileIdx{tile.EmptyTile} ** (MaxBlockDim * MaxBlockDim);
+                st.blockEdit.blockTiles = [_]tile.TileIdx{tile.EmptyTile} ** (MaxBlockDim * MaxBlockDim);
+                st.blockEdit.cancelled = false;
                 st.state = newState;
             },
             .InitialInvalid => unreachable,
@@ -334,7 +367,10 @@ fn switchState(st: *State, newState: State.StateName) void {
         .EditingBlock => switch(newState) {
             .Editing => {
                 // do things here to add the block to the level.
-                unreachable;
+                //TODO need flag to say whether the block edit was cancelled.
+                // if not cancelled, create a new block from the data and
+                // add it to the Level.
+                st.state = newState;
             },
             .CreatingNew => unreachable,
             .EditingBlock => return,
@@ -343,12 +379,104 @@ fn switchState(st: *State, newState: State.StateName) void {
 
         .InitialInvalid => unreachable  // state transition handled implicitly by init0()
     }
+
+    // Clear out any pressed keys in the queue - we don't want presses to carry over
+    // from switching states.
+    while (rl.GetKeyPressed() > 0) {}
 }
 
 fn handleEditingBlock(dT: f32) FrameResponse {
-    if (rl.IsKeyPressed(rl.KEY_ESCAPE)) return .CreateCancelled;
+    if (rl.IsKeyPressed(rl.KEY_ESCAPE)) {
+        GState.blockEdit.cancelled = true;
+        switchState(&GState, .Editing);
+        // Go ahead an continue the frame,
+        // the next frame will reflect the change.
+    }
+
+    const mpos = rl.GetMousePosition();
+    const mouGrid = gridCoords(mpos);
+
+    rl.BeginDrawing();
+    rl.ClearBackground(.{.r = 0, .g = 0, .b = 0, .a = 255});
+
+    const gridWidth = GState.level.tset.gridWidth;
+    const gridHeight = GState.level.tset.gridHeight;
+
+    // Draw the block tiles.
+    var sy: f32 = 0;
+    var ty: usize = 0;
+    var idx: usize = 0;
+    var spec = tile.Set.ImgSpec{};
+
+    while (ty < MaxBlockDim) : ({ty += 1; sy += gridHeight;}) {
+        var tx: usize = 0;
+        var sx: f32 = 0;
+        while (tx < MaxBlockDim) : ({tx += 1; sx += gridWidth; idx += 1;}) {
+            const img = GState.blockEdit.blockTiles[idx];
+            if (img != tile.EmptyTile) {
+                GState.level.tset.draw(img, sx, sy, spec);
+            }
+        }
+    }
+
+    // Draw the current palette tile.
+    const sw = rl.GetScreenWidth();
+    const scale = 2;
+    const fsize = 10;
+    GState.level.tset.draw(GState.blockEdit.curTile, @intToFloat(f32, sw) - gridWidth*scale, 30,
+                           .{.scale = scale});
+    rl.DrawText("Current", sw - 64, 30 + @floatToInt(c_int, gridHeight)*scale + fsize, fsize, rl.WHITE);
+
+    if (mouGrid) |mg| {
+        // Highlight the mouse grid position, if mouse is over
+        // grid.
+        const x = mg.x * gridWidth;
+        const y = mg.y * gridHeight;
+        const ex = x + gridWidth;
+        const ey = y + gridHeight;
+        var pts = [5]rl.Vector2{
+            .{.x = x, .y = y},
+            .{ .x = ex, .y = y},
+            .{ .x = ex, .y = ey},
+            .{ .x = x, .y = ey},
+            .{ .x = x, .y = y},
+        };
+        rl.DrawLineStrip(&pts[0], pts.len, .{.r = 0, .g = 255, .b = 0, .a = 255});
+
+        // Need to set a tile?
+        if (rl.IsMouseButtonPressed(0)) {
+            GState.blockEdit.blockTiles[editBlockIdx(mg)] = GState.blockEdit.curTile;
+        } else if (rl.IsMouseButtonPressed(1)) {
+            GState.blockEdit.blockTiles[editBlockIdx(mg)] = tile.EmptyTile;
+        }
+    }
+
+    rl.EndDrawing();
 
     return .Running;
+}
+
+// Returns index into blockTiles for a mouse grid coordinate.
+fn editBlockIdx(mgrid: rl.Vector2) usize {
+    return @floatToInt(usize, mgrid.y) * MaxBlockDim + @floatToInt(usize, mgrid.x);
+}
+
+const V2i = struct {
+    x: u32,
+    y: u32,
+};
+
+fn gridCoords(p: rl.Vector2) ?rl.Vector2 {
+    const x = p.x / GState.level.tset.gridWidth;
+    const y = p.y / GState.level.tset.gridHeight;
+    const gx = @floor(x);
+    const gy = @floor(y);
+
+    if (gx >= 0 and gy >= 0 and gx < MaxBlockDim and gy < MaxBlockDim) {
+        return rl.Vector2{.x = gx, .y = gy};
+    } else {
+        return null;
+    }
 }
 
 fn updateStatus(st: *State) void {
@@ -356,7 +484,7 @@ fn updateStatus(st: *State) void {
         .InitialInvalid => "ARRRRGH"[0..],
 
         .Editing => blk: {
-            const keyhelp = "Escape[Cancel Edit] Ctrl-X[Quit]";
+            const keyhelp = "Escape[Cancel Edit] Ctrl-B[Edit Block] Ctrl-X[Quit]";
             break :blk fmt.bufPrint(st.statusBuf[0..], "FILE {} {}",
                                        .{st.level.srcFile, keyhelp}) catch unreachable;
         },
@@ -373,7 +501,7 @@ fn updateStatus(st: *State) void {
                                        .{keyhelp}) catch unreachable;
         },
     };
+    st.statusBuf[sl.len] = 0;
     st.statusMsg = st.statusBuf[0..sl.len:0];
-    st.statusBuf[st.statusMsg.len] = 0;
 }
 

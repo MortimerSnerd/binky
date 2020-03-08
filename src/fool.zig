@@ -76,13 +76,13 @@ fn gameLoop(gs: *GameState) !void {
 
     //rl.GuiFont(gs.res.dfont);
 
-    while (!rl.WindowShouldClose() and !controlPressed(rl.KEY_X)) {
+    while (!rl.WindowShouldClose() and !editor.controlPressed(rl.KEY_X)) {
         const dT = rl.GetFrameTime();
 
         switch (curstate) {
             .Running => {
                 onePass(gs, dT);
-                if (controlPressed(rl.KEY_N)) switchState(&curstate, .Editing, gs);
+                if (editor.controlPressed(rl.KEY_N)) switchState(&curstate, .Editing, gs);
             },
             .Editing => _ = switch (try editor.handleFrame(dT)) {
                 .Finished => switchState(&curstate, .Running, gs),
@@ -95,10 +95,6 @@ fn gameLoop(gs: *GameState) !void {
             },
         }
     }
-}
-
-fn controlPressed(key: c_int) bool {
-    return rl.IsKeyDown(rl.KEY_LEFT_CONTROL) and rl.IsKeyPressed(key);
 }
 
 fn switchState(cur: *LoopState, new: LoopState, gs: *GameState) void {
