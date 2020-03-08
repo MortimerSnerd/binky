@@ -10,6 +10,8 @@ const mem = std.mem;
 const OutStream = std.io.OutStream;
 const panic = std.debug.panic;
 const SliceOutStream = std.io.SliceOutStream;
+const SliceInStream = std.io.SliceInStream;
+const warn = std.debug.warn;
 
 const Chunk = packed struct {
     // Chunk id.  Meaningful to clients, means nothing to us.
@@ -66,7 +68,7 @@ pub fn ChunkWriter(comptime StreamError: type) type {
         }
 
         pub fn deinit(self: *Self) void {
-            if (self.chunkStarted) panic("ChunkWriter: Deinit with unfinished chunk");
+            if (self.chunkStarted) panic("ChunkWriter: Deinit with unfinished chunk", .{});
             self.al.free(self.writeBuffer);
         }
 
@@ -110,6 +112,90 @@ pub fn ChunkWriter(comptime StreamError: type) type {
     };
 }
 
+pub fn ChunkReader(comptime StreamError: type) type {
+    return struct {
+        const Self = @This();
+        const InitBufSz = 256 * 1024;
+
+        al: *Allocator,
+        ins: *InStream(StreamError),
+        readBuf: []u8,
+        readStr: SliceInStream,
+
+        pub fn init(al: *Allocator, ins: *InStream(StreamError)) !Self {
+            return Self{
+                .al = al,
+                .ins = ins,
+                .readBuf = try al.alloc(u8, InitBufSz),
+                .readStr = undefined,
+            };
+        }
+
+        pub fn deinit(self: *Self) void {
+            self.al.free(self.readBuf);
+        }
+
+        // Returns a byte slice into the readBuf containing the data of this chunk,
+        // or null if EOF was reached.
+        fn readNextChunkIntern(self: *Self, cid: *u16) !?[]const u8 {
+            var header: Chunk = undefined;
+            var hbuf = mem.asBytes(&header);
+            var numRead: usize = 0;
+
+            while (numRead < hbuf.len) {
+                const actual = try self.ins.read(hbuf[numRead..]);
+
+                if (actual == 0) return null;  //EOF
+                numRead += actual;
+            }
+
+            cid.* = header.id;
+            if (self.readBuf.len < header.len) {
+                self.readBuf = try self.al.realloc(self.readBuf, header.len);
+            }
+
+            numRead = 0;
+            while (numRead < header.len) {
+                const actual = try self.ins.read(self.readBuf[numRead..]);
+                if (actual == 0) return error.UnexpectedEOF;
+
+                numRead += actual;
+            }
+
+            var check = Check.init();
+
+            check.update(self.readBuf[0..numRead]);
+            if (check.final() != header.check) return error.BadChecksum;
+
+            return self.readBuf[0..numRead];
+        }
+
+        // If there's another chunk in the stream, return the id via `cid`,
+        // and return an input stream that can read the chunk data.
+        pub fn readNextChunk(self: *Self, cid: *u16) !?*InStream(SliceInStream.Error) {
+            if (try readNextChunkIntern(self, cid)) |sl| {
+                self.readStr = SliceInStream.init(sl);
+                return &self.readStr.stream;
+            } else {
+                return null;
+            }
+        }
+
+        // Reads a counted string from `ins` and returns the slice for the string.
+        // This slice is only valid until the next call to readNextChunk.
+        pub fn readString(self: *Self, ins: *InStream(SliceInStream.Error)) ![]const u8 {
+            assert(ins == &self.readStr.stream);
+            const ssize: usize = try ins.readIntNative(u16);
+
+            //Nastiness: we use our knowledge of the SliceInStream implementation
+            // to just extract the slice into our buffer.
+            if (ssize + self.readStr.pos >= self.readBuf.len) return error.BufferTooSmall;
+            const rv = self.readBuf[self.readStr.pos..self.readStr.pos+ssize];
+            self.readStr.pos += ssize;
+            return rv;
+        }
+    };
+}
 
 // A OutStream that wraps another outstream, and keeps a running
 // checksum on what's been written.
@@ -150,3 +236,4 @@ pub fn CheckedOutStream(comptime OutStreamError: type) type {
         }
     };
 }
+

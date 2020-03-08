@@ -366,16 +366,49 @@ pub const Level = struct {
 
     // Saves the level to the given file path.
     pub fn save(lv: *Level) !void {
-        var f = try fs.cwd().createFile(lv.srcFile, .{});
+        //TODO: write to temp file, rename when successful.
+        var f = try fs.cwd().createFile(lv.srcFile, .{}); defer f.close();
         var fout = f.outStream();
         var wr: chunk.ChunkWriter(fs.File.OutStream.Error) = undefined;
 
-        try wr.init(lv.al, &fout.stream);
+        try wr.init(lv.al, &fout.stream); defer wr.deinit();
 
         var fst = try wr.startNamedChunk(ChunkTypes, .LevelHeader);
         try wr.writeString(fst, lv.srcFile);
         try wr.writeString(fst, lv.imgFile);
         try wr.endChunk();
+    }
+
+    pub fn load(al: *mem.Allocator, arena: *mem.Allocator, srcFile: []const u8) !Level {
+        var f = try fs.cwd().openFile(srcFile, .{}); defer f.close();
+        var fin = f.inStream();
+        var reader = try chunk.ChunkReader(fs.File.InStream.Error).init(al, &fin.stream); defer reader.deinit();
+        var imgFile: ?[:0]const u8 = null;
+        var rsFile: ?[]const u8 = null;
+
+        defer {
+            if (imgFile) |m| al.free(m);
+            if (rsFile) |m| al.free(m);
+        }
+
+        var cid: u16 = undefined;
+        if (try reader.readNextChunk(&cid)) |ins| {
+            if (cid == 0) {
+                rsFile = try mem.dupe(al, u8, try reader.readString(ins));
+                imgFile = try mem.dupeZ(al, u8, try reader.readString(ins));
+            } else {
+                panic("bad cid {}\n", .{cid});
+            }
+        } else {
+            panic("no ready chunk\n", .{});
+        }
+
+        //DEBUGGERY
+        if (rsFile) |rs| {
+            if (imgFile) |imgf| {
+                return Level.initEmpty(al, arena, rs, imgf, 32);
+            } else unreachable;
+        } else unreachable;
     }
 };
 
