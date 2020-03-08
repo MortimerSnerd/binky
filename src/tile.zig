@@ -386,14 +386,9 @@ pub const Level = struct {
         var imgFile: ?[:0]const u8 = null;
         var rsFile: ?[]const u8 = null;
 
-        defer {
-            if (imgFile) |m| al.free(m);
-            if (rsFile) |m| al.free(m);
-        }
-
-        var cid: u16 = undefined;
-        if (try reader.readNextChunk(&cid)) |ins| {
-            if (cid == 0) {
+        var cid: ChunkTypes = undefined;
+        if (try reader.readNextNamedChunk(ChunkTypes, &cid)) |ins| {
+            if (cid == .LevelHeader) {
                 rsFile = try mem.dupe(al, u8, try reader.readString(ins));
                 imgFile = try mem.dupeZ(al, u8, try reader.readString(ins));
             } else {

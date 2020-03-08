@@ -181,6 +181,17 @@ pub fn ChunkReader(comptime StreamError: type) type {
             }
         }
 
+        pub fn readNextNamedChunk(self: *Self, comptime Name: type, cid: *Name) !?*InStream(SliceInStream.Error) {
+            var cidn: u16 = undefined;
+
+            if (try self.readNextChunk(&cidn)) |is| {
+                cid.* = @intToEnum(Name, cidn);
+                return is;
+            } else {
+                return null;
+            }
+        }
+
         // Reads a counted string from `ins` and returns the slice for the string.
         // This slice is only valid until the next call to readNextChunk.
         pub fn readString(self: *Self, ins: *InStream(SliceInStream.Error)) ![]const u8 {
