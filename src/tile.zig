@@ -1,9 +1,12 @@
 const std = @import("std");
 const chunk = @import("chunk.zig");
 
+const assert = std.debug.assert;
 const fs = std.fs;
 const heap = std.heap;
 const mem = std.mem;
+const OutStream = std.io.OutStream;
+const InStream = std.io.InStream;
 const rl = @import("raylib.zig");
 const warn = std.debug.warn;
 const panic = std.debug.panic;
@@ -13,7 +16,7 @@ pub const Layer = struct {
     // Unowned slice of tile blocks.  The blockDefs are likely shared
     // between multiple layers, so an externally managed array will
     // have all of the blocks, and this will be a slice into that array.
-    blockDefs: []const Block,
+    blockDefs: []Block,
 
     // Owned slice of block instances.  No reason for these
     // to be shared between multiple layers, so we own this
@@ -35,7 +38,7 @@ pub const Layer = struct {
         }
     }
 
-    pub fn init(blockDefs: []const Block, depthScale: f32) Layer {
+    pub fn init(blockDefs: []Block, depthScale: f32) Layer {
         return Layer{
             .blockDefs = blockDefs,
             .blocks = &[0]BlockInst{},
@@ -76,6 +79,22 @@ pub const Block = struct {
         };
     }
 
+    // Serializes this block to the given stream.  `tileIdx` is the current position
+    // in the large array of all the TileIdx sequences, and where our slice will point
+    // to once loaded.  The tile idx's have already been written out, so we don't write them here.
+    pub fn save(self: *Block, comptime Error: type, outs: *OutStream(Error), tileIdx: *u32) !void {
+        try outs.writeIntNative(u16, self.width);
+        try outs.writeIntNative(u32, tileIdx.*);
+        try outs.writeIntNative(u32, @intCast(u32, self.tiles.len));
+    }
+
+    pub fn load(self: *Block, comptime Error: type, ins: *InStream(Error), tileIdxs: []TileIdx) !void {
+        self.width = try ins.readIntNative(u16);
+        const start = try ins.readIntNative(u32);
+        const num = try ins.readIntNative(u32);
+        self.tiles = tileIdxs[start..start+num];
+    }
+
     pub const DrawSpec = struct {
         tint: rl.Color = rl.WHITE,
         scale: f32 = 1,
@@ -92,31 +111,6 @@ pub const Block = struct {
             if (img == EmptyTile) continue;
             tm.draw(img, pos.x, pos.y, tmspec);
         }
-    }
-
-    // Starting at `seekPos`, tries to interpret the bytes as a
-    // Block.  Returns null on EOF.  The returned Block
-    // references the bytes in `bytes`, so `bytes` has to live as
-    // long as the returned Block.
-    pub fn deserialize(bytes: []const u8, seekPos: *usize) !?Block {
-        if (bytes.len == 0) return null;
-        const last = bytes.len;
-
-        if (seekPos.* >= last) return null;
-        if (seekPos.*+2 > last) return error.BadFormat;
-
-        const width = @intCast(usize, bytes[seekPos.*]);
-        const height = @intCast(usize, bytes[seekPos.*+1]);
-        const lastbody = seekPos.* + 2 + width * height;
-
-        if (width == 0 or height == 0) return error.BadFormat;
-
-        seekPos.* += 2;
-        const firstbody = seekPos.*;
-        if (lastbody > last) return error.BadFormat;
-        seekPos.* = lastbody;
-
-        return try Block.init(bytes[firstbody..lastbody], width, height);
     }
 
     const TileIterator = struct {
@@ -303,7 +297,7 @@ pub const Level = struct {
 
     // When editing, these will contain the ArrayLists that back the Layer
     // blockDefs.  Uses the arena allocator.
-    editLayerBacking: [1]std.ArrayList(Block),
+    editLayerBacking: std.ArrayList(Block),
 
     // When editing, this contains backs the Block.tiles for new/changed
     // blocks.  Uses the arena allocator.
@@ -331,9 +325,7 @@ pub const Level = struct {
             .layers = [_]Layer{
                 Layer.init(noBlocks[0..0], 1)
             },
-            .editLayerBacking = .{
-                std.ArrayList(Block).init(arena),
-            },
+            .editLayerBacking = std.ArrayList(Block).init(arena),
             .editTileBacking = std.ArrayList(TileIdx).init(arena),
             .layerBlocks = null,
             .blockTiles = null,
@@ -376,6 +368,40 @@ pub const Level = struct {
         var fst = try wr.startNamedChunk(ChunkTypes, .LevelHeader);
         try wr.writeString(fst, lv.srcFile);
         try wr.writeString(fst, lv.imgFile);
+
+        // Count number of blocks and tile indices we'll need to store for the new `layerBlocks`
+        // and `tiles` members for blocks.
+        var numBlocks: u32 = 0;
+        var numTileIdxs: usize = 0;
+
+        for (lv.layers) |*lay| {
+            for (lay.blockDefs) |bd| {
+                numBlocks += 1;
+                numTileIdxs += bd.tiles.len;
+            }
+        }
+
+        // Write the tile indices first, as we'll need these read in before
+        // the Blocks can be created.
+        try fst.writeIntNative(u32, @intCast(u32, numTileIdxs));
+
+        for (lv.layers) |*lay| {
+            for (lay.blockDefs) |bd| {
+                try fst.write(bd.tiles[0..]);
+            }
+        }
+
+        // Write counted array for all the blocks.  Will include the tileIdx slice sizes
+        try fst.writeIntNative(u32, numBlocks);
+
+        var tileIdx: u32 = 0;
+        for (lv.layers) |*lay| {
+            for (lay.blockDefs) |*bd| {
+                try bd.save(@TypeOf(fst.*).Error, fst, &tileIdx);
+            }
+        }
+
+        // Write counter array for all of the slices of tiles for each block.
         try wr.endChunk();
     }
 
@@ -385,12 +411,24 @@ pub const Level = struct {
         var reader = try chunk.ChunkReader(fs.File.InStream.Error).init(al, &fin.stream); defer reader.deinit();
         var imgFile: ?[:0]const u8 = null;
         var rsFile: ?[]const u8 = null;
+        var tileIdxs: []u8 = undefined;
+        var blockDefs: []Block = undefined;
 
         var cid: ChunkTypes = undefined;
         if (try reader.readNextNamedChunk(ChunkTypes, &cid)) |ins| {
             if (cid == .LevelHeader) {
                 rsFile = try mem.dupe(al, u8, try reader.readString(ins));
                 imgFile = try mem.dupeZ(al, u8, try reader.readString(ins));
+                const numTileIdxs = try ins.readIntNative(u32);
+                tileIdxs = try al.alloc(u8, numTileIdxs);
+                const numRead = try ins.read(tileIdxs[0..]);
+                assert(numRead == tileIdxs.len);
+
+                const numBlocks = try ins.readIntNative(u32);
+                blockDefs = try al.alloc(Block, numBlocks);
+                for (blockDefs) |*bd| {
+                    try bd.load(@TypeOf(ins.*).Error, ins, tileIdxs);
+                }
             } else {
                 panic("bad cid {}\n", .{cid});
             }

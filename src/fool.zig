@@ -43,6 +43,7 @@ pub fn main() !void {
     var gs = GameState {
         .al = heap.c_allocator,
         .level = try tile.Level.load(heap.c_allocator, heap.c_allocator, "resources/default.blk"),
+        //.level = null,
         .cam = .{
             .offset = .{ .x = WinWidth * 0.5, .y = WinHeight * 0.5 },
             .target = .{ .x = 100, .y = 100 },
