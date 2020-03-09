@@ -13,6 +13,13 @@ this could be packaged as an easily re-usable library.  And once that
 happens, I can clean things up and target actual real releases of
 Zig and raylib, rather than whatever I happened to grab that day.
 
+## Status
+
+Paused.  I like Zig, I'll probably come back for another 
+look in 0.6 or 0.7.  For most things that I ran into 
+where I thought "there should be a better way to do this", 
+there was a issue opened already with a lot of information,
+and a target milestone.  
 
 ## Technical overview, why it may suck.
 
